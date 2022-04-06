@@ -10,9 +10,13 @@ Responsibilities:
 
 
 class BoardManager {
-    constructor() {
+    constructor(rows, cols) {
+        this.cols = cols;
+        this.rows = rows;
+        this.calculateBoardWindow(width, height);
         this.worm;
         this.timeKeeper = 0;
+        this.gameTick = 500;//milliseconds between actual changes to the board (not animations)
     }
     spawnWorm(xPos, yPos) {
         this.worm = new Worm(xPos, yPos);
@@ -20,37 +24,53 @@ class BoardManager {
     spawnFood() {
         //never directly in front of player
     }
-    draw(rows, cols, gridSize) {
+    startGame() {
+        this.spawnWorm(floor(this.cols / 2) - 1, floor(this.rows / 2) - 1);
+        // this.spawnWorm(0, 0);
+    }
+    draw() {
         //draw board
-        let wideBorder = (width - (cols * gridSize)) / 2;
-        let highBorder = (height - (rows * gridSize)) / 2;
+        let wideBorder = (width - (this.cols * this.gridSize)) / 2;
+        let highBorder = (height - (this.rows * this.gridSize)) / 2;
         //debug lines
-        for (let i = 0; i <= cols; i++) {
-            let xPos = map(i, 0, cols, wideBorder, width - wideBorder);
+        for (let i = 0; i <= this.cols; i++) {
+            let xPos = map(i, 0, this.cols, wideBorder, width - wideBorder);
             line(xPos, highBorder, xPos, height - highBorder);
         }
-        for (let i = 0; i <= rows; i++) {
-            let yPos = map(i, 0, rows, highBorder, height - highBorder);
+        for (let i = 0; i <= this.rows; i++) {
+            let yPos = map(i, 0, this.rows, highBorder, height - highBorder);
             line(wideBorder, yPos, width - wideBorder, yPos);
         }
 
         //debug squares
         fill('red');
-        rect(wideBorder, highBorder, gridSize);
+        rect(wideBorder, highBorder, this.gridSize);
         fill('yellow');
-        rect(width - wideBorder - gridSize, height - highBorder - gridSize, gridSize);
+        rect(width - wideBorder - this.gridSize, height - highBorder - this.gridSize, this.gridSize);
 
         //draw all foods
 
-        this.worm.draw(rows, cols, gridSize, wideBorder, highBorder);
+        //draw the worm
+        let animPercent = this.timeKeeper / this.gameTick;
+        this.worm.draw(this.rows, this.cols, this.gridSize, wideBorder, highBorder, animPercent);
+
     }
     update(state) {
         if (state == 'play') {
             this.timeKeeper += deltaTime;
-            if (this.timeKeeper >= 500) {
-                this.timeKeeper -= 500;
+            if (this.timeKeeper >= this.gameTick) {
+                this.timeKeeper -= this.gameTick;
                 this.worm.move(false);
             }
+        }
+    }
+    calculateBoardWindow(wide, tall) {
+        let boardRatio = this.cols / this.rows;
+        let windowRatio = wide / tall;
+        if (boardRatio < windowRatio) {
+            this.gridSize = tall / this.rows;
+        } else {
+            this.gridSize = wide / this.cols;
         }
     }
 }
@@ -60,95 +80,254 @@ class Worm {
     constructor(x, y) {
 
         //control movement
-        this.directionStack = [RIGHT];
+        this.direction = RIGHT;
 
         //worm section positions
         this.wormBody = [];
-        let startLength = 5;
+        let startLength = 10;
+
         if (this.direction == RIGHT) {
             for (let i = 0; i < startLength; i++) {
-                this.wormBody.push({ x: x - i, y: y });
+                this.wormBody.push({ x: x - i, y: y, direction: this.direction });
             }
         } else {
             for (let i = 0; i < startLength; i++) {
-                this.wormBody.push({ x: x + i, y: y });
+                this.wormBody.push({ x: x + i, y: y, direction: this.direction });
             }
         }
 
     }
 
     //draws the worm
-    draw(rows, cols, gridSize, xBorder, yBorder) {
+    draw(rows, cols, gridSize, xBorder, yBorder, animPercent) {
+        push();
+        let numSegments = this.wormBody.length;
+        let numSubSegments = 5;
+        let totalSubSegments = numSubSegments * numSegments;
 
+        let maxPctOffsetOnSpline = 1 / numSegments;
+
+        //convert all grid coords to screenspace coords
+        let threeSpline = [];
+        for (let i = numSegments - 1; i >= 0; i--) {
+            let currY = map(this.wormBody[i].y, 0, rows, yBorder + gridSize / 2, height - yBorder + gridSize / 2);
+            let currX = map(this.wormBody[i].x, 0, cols, xBorder + gridSize / 2, width - xBorder + gridSize / 2);
+            threeSpline.unshift(new THREE.Vector2(currX, currY));
+        }
+
+        //predict the coord based on direction
+        let predict = this.getNextSegment();
+        let xPos = map(predict.x, 0, cols, xBorder + gridSize / 2, width - xBorder + gridSize / 2);
+        let yPos = map(predict.y, 0, rows, yBorder + gridSize / 2, height - yBorder + gridSize / 2);
+        threeSpline.unshift(new THREE.Vector2(xPos, yPos));
+
+        //make a set of points along a smooth line
+        const curve = new THREE.SplineCurve(threeSpline);
+        // const curve = new THREE.CubicBezierCurve(threeSpline);
+        // const curve = new THREE.QuadraticBezierCurve(threeSpline);
+        
         //draw body segments
-        for (let i = this.wormBody.length - 1; i >= 0; i--) {
-            let xPos = map(this.wormBody[i].x, 0, cols, xBorder, width - xBorder);
-            let yPos = map(this.wormBody[i].y, 0, rows, yBorder, height - yBorder);
-            if (i == this.wormBody.length - 1) {
-                fill('red');//red tail
-            } else if (i == 0) {
-                fill('green');//green head
-            } else {
-                fill('blue');
+        for (let i = numSegments; i > 0; i--) {
+            //start from the tail
+
+            // fill('salmon');
+            strokeWeight(gridSize/15);
+            // stroke('tomato');
+            // stroke('black');
+            fill('#e5a7a7');
+            stroke('#b72f2f');
+            let bIsHead = false;
+            if (i == 3) {
+                stroke('#dd9999');
+                fill('#dd9999');
+            } else if (i == 1) {
+                bIsHead = true;
+                noStroke();
             }
-            ellipse(xPos + gridSize / 2, yPos + gridSize / 2, gridSize);
+
+            for (let s = numSubSegments - 1; s >= (bIsHead ? numSubSegments - 1 : 0); s--) {
+                let subSegIndex = s + (i - 1) * numSubSegments;
+                let subSegPct = (subSegIndex + 1) / totalSubSegments;
+                // print(subSegPct);
+                let extendAnim = 2;
+                let alpha = lerp(-1, extendAnim, 1 - animPercent);
+                let rateOfChange = 1.8;
+                alpha = constrain(-pow(-alpha + rateOfChange * subSegIndex / totalSubSegments, 3) + 1, 0, 1);
+                alpha = (alpha * -1) + 1;
+
+                subSegPct -= lerp(0, maxPctOffsetOnSpline, alpha);
+                
+                let pos = curve.getPointAt(subSegPct);
+                ellipse(pos.x, pos.y, gridSize);
+            }
+            // noLoop();
+
+            // let direction;
+            // if (currX == nextX) {
+            //     if (currY < nextY) {
+            //         direction = DOWN;
+            //     } else {
+            //         direction = UP;
+            //     }
+            // } else {
+            //     if (currX < nextX) {
+            //         direction = RIGHT;
+            //     } else {
+            //         direction = LEFT;
+            //     }
+            // }
+
+            // console.log(totalSubSegments);
+            // let maxOffset = gridSize/numSubSegments;
+
+            // let textOff = 50;//debug
+            // for (let s = numSubSegments - 1; s >= 0; s--) {
+
+            //     let subSegIndex = s + (i - 1) * numSubSegments;
+            //     let segIndex = (numSubSegments - s - 1) / (numSubSegments);
+
+            //     let xPos = lerp(currX, nextX, segIndex);
+            //     let yPos = lerp(currY, nextY, segIndex);
+
+            //     // maxOffset = lerp(gridSize, gridSize / numSubSegments, subSegIndex / totalSubSegments);
+            //     let extendAnim = 2;
+            //     let alpha = lerp(-1, extendAnim, 1 - animPercent);
+            //     let rateOfChange = 1.7
+            //     alpha = constrain(-pow(-alpha + rateOfChange * subSegIndex / totalSubSegments, 3) + 1, 0, 1);
+            //     alpha = (alpha * -1) + 1;
+
+            //     // xPos += lerp(0, maxOffset, alpha);
+
+            //     switch (direction) {
+            //         case LEFT:
+            //             xPos -= lerp(0, maxOffset, alpha);
+            //             break;
+            //         case RIGHT:
+            //             xPos += lerp(0, maxOffset, alpha);
+            //             break;
+            //         case DOWN:
+            //             yPos += lerp(0, maxOffset, alpha);
+            //             break;
+            //         case UP:
+            //             yPos -= lerp(0, maxOffset, alpha);
+            //             break;
+            //     }
+
+            //     if (s == 0) {
+            //         fill('cyan');
+            //     }
+            //     ellipse(xPos, yPos, gridSize);
+            //     // ellipse(currX, currY, gridSize);
+            //     // ellipse(nextX, nextY, gridSize);
+
+            //     //debug
+            //     // text(s, currX, currY + textOff);
+            //     // textOff += 50;
+            //     // text(alpha, currX, currY + textOff);
+            //     // textOff += 50;
+            //     // text(subSegIndex, currX, currY + textOff);
+            //     // textOff += 50;
+            // }
+
+        }
+
+
+        // {
+        //     fill('green');//green head
+        //     //draw the head
+        //     let xPos = map(this.wormBody[0].x, 0, cols, xBorder + gridSize / 2, width - xBorder + gridSize / 2);
+        //     let yPos = map(this.wormBody[0].y, 0, rows, yBorder + gridSize / 2, height - yBorder + gridSize / 2);
+
+        //     let extendAnim = 2;
+        //     let alpha = lerp(-1, extendAnim, 1 - animPercent);
+        //     let rateOfChange = 1.7
+        //     alpha = constrain(-pow(-alpha, 3) + 1, 0, 1);
+        //     alpha = (alpha * -1) + 1;
+
+        //     switch (this.direction) {
+        //         case LEFT:
+        //             xPos -= lerp(0, maxOffset, alpha);
+        //             break;
+        //         case RIGHT:
+        //             xPos += lerp(0, maxOffset, alpha);
+        //             break;
+        //         case DOWN:
+        //             yPos += lerp(0, maxOffset, alpha);
+        //             break;
+        //         case UP:
+        //             yPos -= lerp(0, maxOffset, alpha);
+        //             break;
+        //     }
+        //     ellipse(xPos, yPos, gridSize);
+        // }
+
+        //debug line
+        // var splinePoints = curve.getSpacedPoints(totalSubSegments);
+        // for (let i = 0; i < splinePoints.length; i++) {
+        //     ellipse(splinePoints[i].x, splinePoints[i].y, 10);
+        // }
+        pop();
+    }
+
+    move(bAddSegment) {
+        //moves worm position (on grid)
+        this.wormBody.unshift(this.getNextSegment());
+
+        //if we aren't adding a segment then delete the last section
+        if (!bAddSegment) {
+            this.wormBody.pop();
         }
 
     }
-
-    move(bAddSegement) {
-        //moves worm position (on grid)
-
-        //move the head
+    getNextSegment() {
+        //store the head
         let headX = this.wormBody[0].x;
         let headY = this.wormBody[0].y;
-        switch (this.directionStack[0]) {
+        let nextSeg;
+        switch (this.direction) {
             case LEFT:
                 // this.wormBody.head.x--;
-                this.wormBody.unshift({ x: headX - 1, y: headY });
+                // this.wormBody.unshift({ x: headX - 1, y: headY, direction: this.direction });
+                nextSeg = { x: headX - 1, y: headY, direction: this.direction };
                 break;
             case RIGHT:
                 // this.wormBody.head.x++;
-                this.wormBody.unshift({ x: headX + 1, y: headY });
+                // this.wormBody.unshift({ x: headX + 1, y: headY, direction: this.direction });
+                nextSeg = { x: headX + 1, y: headY, direction: this.direction };
                 break;
             case UP:
                 // this.wormBody.head.y--;
-                this.wormBody.unshift({ x: headX, y: headY - 1 });
+                // this.wormBody.unshift({ x: headX, y: headY - 1, direction: this.direction });
+                nextSeg = { x: headX, y: headY - 1, direction: this.direction };
                 break;
             case DOWN:
                 // this.wormBody.head.y++;
-                this.wormBody.unshift({ x: headX, y: headY + 1 });
+                // this.wormBody.unshift({ x: headX, y: headY + 1, direction: this.direction });
+                nextSeg = { x: headX, y: headY + 1, direction: this.direction };
                 break;
             default:
                 console.error("worm direction = " + this.direction);
                 break;
         }
-        //if we aren't adding a segment then delete the last section
-        if (!bAddSegement) {
-            this.wormBody.pop();
-        }
-
-        //update direction
-        if(this.directionStack.length > 1){
-            this.directionStack.shift();
-        }
-
+        return nextSeg;
     }
 
     changeDirection(direction) {
-        let lastDirection = this.directionStack[this.directionStack.length-1];
+
+        let lastDirection = this.wormBody[0].direction;
+
         switch (direction) {
             case LEFT:
-                if (lastDirection != RIGHT) this.directionStack.push(direction);
+                if (lastDirection != RIGHT) this.direction = direction;
                 break;
             case RIGHT:
-                if (lastDirection != LEFT) this.directionStack.push(direction);
+                if (lastDirection != LEFT) this.direction = direction;
                 break;
             case UP:
-                if (lastDirection != DOWN) this.directionStack.push(direction);
+                if (lastDirection != DOWN) this.direction = direction;
                 break;
             case DOWN:
-                if (lastDirection != UP) this.directionStack.push(direction);
+                if (lastDirection != UP) this.direction = direction;
                 break;
             default:
                 console.error("Worm recieved something that isnt a direction : " + direction);

@@ -1,32 +1,27 @@
 /*
-The GameManager class.
+The StateManager class.
 Responsibilities:
     -Manage game loop (start/stop game)
     -Show windows based on game state
     -keeps track of scores
 */
 
-
-
-class GameManager {
+class StateManager {
 
     constructor() {
-    // let bCanStore = false;
-      this.rows = 30;
-      this.cols = 60;
-      this.board = new BoardManager();
+      this.board = new BoardManager(30,60);
+      this.state = 'ready';
+      // let bCanStore = false;
       // if (storageAvailable("localStorage")) {
       //   bCanStore = true;
       //   checkStorage();
       // }
-      // this.startGame();
-      this.state = 'ready';
-      this.calculateBoardWindow(width, height);
+      
     }
     
     startGame() {
       this.state = 'play';
-      this.board.spawnWorm(floor(this.cols/2), floor(this.rows/2));
+      this.board.startGame();
     }
     
     togglePause(forceState){
@@ -41,7 +36,7 @@ class GameManager {
 
     draw() {
       if(this.state == 'play' || this.state == 'pause'){
-        this.board.draw(this.rows, this.cols, this.gridSize);
+        this.board.draw();
       }
       if(this.state == 'pause'){
         //replace this with a pause dialogue and button
@@ -49,20 +44,17 @@ class GameManager {
       }
     }
   
-    calculateBoardWindow(wide, tall){
-      let boardRatio = this.cols/this.rows;
-      let windowRatio = wide/tall;
-      if(boardRatio < windowRatio){
-        this.gridSize = tall/this.rows;
-      } else {
-        this.gridSize = wide/this.cols;
-      }
-    }
-  
     update() {
       this.board.update(this.state);
     }
   
+}
+
+class Button {
+  //size
+  //position
+  //callback
+  //image
 }
 
 /***********************local storage functions**********************/
@@ -157,3 +149,5 @@ function handleVisibilityChange() {
     game.togglePause('pause');
   }
 }
+
+
