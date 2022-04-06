@@ -43,6 +43,10 @@ class GameManager {
       if(this.state == 'play' || this.state == 'pause'){
         this.board.draw(this.rows, this.cols, this.gridSize);
       }
+      if(this.state == 'pause'){
+        //replace this with a pause dialogue and button
+        text("Press enter to Unpause", width/2,height/2);
+      }
     }
   
     calculateBoardWindow(wide, tall){
@@ -124,3 +128,32 @@ function clearScores() {
 // let gameDataObj = JSON.parse(localStorage.gameData)
 
 //store top ~5 personal best scores locally
+
+/***********************visibility detection**********************/
+
+// Set the name of the hidden property and the change event for visibility
+var hidden, visibilityChange;
+if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
+  hidden = "hidden";
+  visibilityChange = "visibilitychange";
+} else if (typeof document.msHidden !== "undefined") {
+  hidden = "msHidden";
+  visibilityChange = "msvisibilitychange";
+} else if (typeof document.webkitHidden !== "undefined") {
+  hidden = "webkitHidden";
+  visibilityChange = "webkitvisibilitychange";
+}
+
+// Warn if the browser doesn't support addEventListener or the Page Visibility API
+if (typeof document.addEventListener === "undefined" || hidden === undefined) {
+  console.log("Automatic pausing is only available in a browser such as Google Chrome or Firefox, that supports the Page Visibility API.");
+} else {
+  // Handle page visibility change
+  document.addEventListener(visibilityChange, handleVisibilityChange, false);
+}
+
+function handleVisibilityChange() {
+  if (document[hidden]) {
+    game.togglePause('pause');
+  }
+}

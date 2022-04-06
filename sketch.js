@@ -11,12 +11,11 @@ function setup() {
   var cnv = createCanvas(divWidth, divHeight);
   cnv.parent("worm-game");
   game = new GameManager();
-
 }
 
 function draw() {
   background(220);
-
+  
   game.update();
   game.draw();
 

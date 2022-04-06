@@ -60,7 +60,7 @@ class Worm {
     constructor(x, y) {
 
         //control movement
-        this.direction = RIGHT;
+        this.directionStack = [RIGHT];
 
         //worm section positions
         this.wormBody = [];
@@ -102,7 +102,7 @@ class Worm {
         //move the head
         let headX = this.wormBody[0].x;
         let headY = this.wormBody[0].y;
-        switch (this.direction) {
+        switch (this.directionStack[0]) {
             case LEFT:
                 // this.wormBody.head.x--;
                 this.wormBody.unshift({ x: headX - 1, y: headY });
@@ -128,22 +128,27 @@ class Worm {
             this.wormBody.pop();
         }
 
-        //change direction
+        //update direction
+        if(this.directionStack.length > 1){
+            this.directionStack.shift();
+        }
+
     }
 
     changeDirection(direction) {
+        let lastDirection = this.directionStack[this.directionStack.length-1];
         switch (direction) {
             case LEFT:
-                if (this.direction != RIGHT) this.direction = direction;
+                if (lastDirection != RIGHT) this.directionStack.push(direction);
                 break;
             case RIGHT:
-                if (this.direction != LEFT) this.direction = direction;
+                if (lastDirection != LEFT) this.directionStack.push(direction);
                 break;
             case UP:
-                if (this.direction != DOWN) this.direction = direction;
+                if (lastDirection != DOWN) this.directionStack.push(direction);
                 break;
             case DOWN:
-                if (this.direction != UP) this.direction = direction;
+                if (lastDirection != UP) this.directionStack.push(direction);
                 break;
             default:
                 console.error("Worm recieved something that isnt a direction : " + direction);
