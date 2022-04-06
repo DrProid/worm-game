@@ -5,3 +5,11 @@ html, body {
 canvas {
   display: block;
 }
+
+#worm-game {
+  margin-top: 5vh;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90vw;
+  height: 90vh;
+}

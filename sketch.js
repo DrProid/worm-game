@@ -1,20 +1,18 @@
-
-
 let game;
-
 //LEFT and RIGHT already exist as string constants (for aligning) so I used those
 //but I had to make UP and DOWN myself
 const UP = 'up';
 const DOWN = 'down';
 
+var divWidth = document.getElementById('worm-game').offsetWidth;
+var divHeight = document.getElementById('worm-game').offsetHeight;
+
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-
-
+  var cnv = createCanvas(divWidth, divHeight);
+  cnv.parent("worm-game");
   game = new GameManager();
-  // frameRate(2);
-}
 
+}
 
 function draw() {
   background(220);
@@ -22,6 +20,13 @@ function draw() {
   game.update();
   game.draw();
 
+}
+
+function windowResized(){
+  divWidth = document.getElementById('worm-game').offsetWidth;
+  divHeight = document.getElementById('worm-game').offsetHeight;
+  resizeCanvas(divWidth, divHeight);
+  game.calculateBoardWindow(width, height);
 }
 
 //controls input
@@ -46,10 +51,9 @@ function keyPressed() {
 }
 
 class Worm {
-  //tracks worm position (on grid)
-  //draws the worm
+  
   constructor(x, y) {
-
+   
     //worm section positions
     this.wormBody = {};
     this.wormBody.head = {x: x, y: y};
@@ -62,19 +66,20 @@ class Worm {
     
     //control movement
     this.direction = LEFT;
-
+    
     //worm look
     // this.size = 50;
   }
+  
+  //draws the worm
   draw(rows, cols, gridSize, xBorder, yBorder) {
-
-
+    
     //draw tail
     fill('red');
     let xPos = map(this.wormBody.tail.x, 0, rows, xBorder, width - xBorder);
     let yPos = map(this.wormBody.tail.y, 0, cols, yBorder, height - yBorder);
     ellipse(xPos+ gridSize/2, yPos + gridSize/2, gridSize);
-
+    
     fill('blue');
     //draw body segments
     for(let i = this.wormBody.body.length-1; i >= 0; i--){
@@ -82,15 +87,16 @@ class Worm {
       yPos = map(this.wormBody.body[i].y, 0, cols, yBorder, height - yBorder);
       ellipse(xPos+ gridSize/2, yPos+ gridSize/2, gridSize);
     }
-
+    
     fill('green');
     //draw head
     xPos = map(this.wormBody.head.x, 0, rows, xBorder, width - xBorder);
     yPos = map(this.wormBody.head.y, 0, cols, yBorder, height - yBorder);
     ellipse(xPos + gridSize/2, yPos+ gridSize/2, gridSize);
-
+    
   }
-
+  
+  //moves worm position (on grid)
   move(bAddSegement) {
     //add the current head to the body
     this.wormBody.body.push({...this.wormBody.head});
@@ -135,20 +141,32 @@ class BoardManager {
   }
   draw(rows, cols, gridSize) {
     //draw board
-    let wideBorder = (width-(rows*gridSize))/2;
-    let highBorder = (height-(cols*gridSize))/2;
-    for(let i = 0; i <= rows; i++){
-      let xPos =  map(i, 0, rows, wideBorder, width-wideBorder);
+    let wideBorder = (width-(cols*gridSize))/2;
+    let highBorder = (height-(rows*gridSize))/2;
+    //debug lines
+    for(let i = 0; i <= cols; i++){
+      let xPos =  map(i, 0, cols, wideBorder, width-wideBorder);
       line(xPos, highBorder, xPos, height-highBorder);
     }
-    for(let i = 0; i <= cols; i++){
-      let yPos =  map(i, 0, cols, highBorder, height-highBorder);
+    for(let i = 0; i <= rows; i++){
+      let yPos =  map(i, 0, rows, highBorder, height-highBorder);
       line(wideBorder, yPos, width-wideBorder, yPos);
     }
+    //debug squares
+    fill('red');
+    rect(wideBorder, highBorder, gridSize);
+    fill('yellow');
+    // rectMode(CENTER);
+    rect( width-wideBorder-gridSize, height-highBorder-gridSize, gridSize);
 
     //draw all foods
 
     this.worm.draw(rows, cols, gridSize, wideBorder, highBorder);
+  }
+  update(){
+    if(this.worm != undefined && frameCount%30==0){
+      this.worm.move(false);
+    }
   }
 }
 
@@ -158,14 +176,14 @@ class GameManager {
   //keep score
   //spawn foods (never directly in front of player)
   constructor() {
-    this.rows = 40;
-    this.cols = 30;
+    this.rows = 30;
+    this.cols = 60;
     this.board = new BoardManager();
     // if (storageAvailable("localStorage")) {
     //   bCanStore = true;
     //   checkStorage();
     // }
-    this.calculateBoardWindow();
+    this.calculateBoardWindow(width, height);
     this.startGame();
   }
 
@@ -177,19 +195,18 @@ class GameManager {
     this.board.draw(this.rows, this.cols, this.gridSize);
   }
 
-  calculateBoardWindow(){
-    if(width < height){
-      this.gridSize = width/this.cols;
+  calculateBoardWindow(wide, tall){
+    let boardRatio = this.cols/this.rows;
+    let windowRatio = wide/tall;
+    if(boardRatio < windowRatio){
+      this.gridSize = tall/this.rows;
     } else {
-      this.gridSize = height/this.rows;
+      this.gridSize = wide/this.cols;
     }
   }
 
   update() {
-    if(frameCount%30==0){
-      
-      this.board.worm.move(random()>0.5);
-    }
+    this.board.update();
   }
 
 }
