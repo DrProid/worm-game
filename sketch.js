@@ -22,6 +22,11 @@ function draw() {
   game.update();
   game.draw();
 
+  text(width, 100, 100);
+  text(height, 200, 100);
+  text(windowWidth, 100, 200);
+  text(windowHeight, 200, 200);
+
   if(bIsDebugMode){
     push();
     fill('black');
