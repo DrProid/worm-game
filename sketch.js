@@ -6,7 +6,7 @@ const DOWN = 'down';
 
 let mouseDown;
 let bIsDebugMode = false;
-let version = "0.1";
+let version = "0.11";
 
 var divWidth = document.getElementById('worm-game').offsetWidth;
 var divHeight = document.getElementById('worm-game').offsetHeight;
@@ -146,8 +146,8 @@ function swipeControlEnd() {
           break;
       }
     } else {
-      let fs = fullscreen();
-      fullscreen(!fs);
+      // let fs = fullscreen();
+      fullscreen(true);
     }
   }
 }
