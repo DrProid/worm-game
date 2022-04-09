@@ -27,7 +27,7 @@ function draw() {
   text(windowWidth, 100, 200);
   text(windowHeight, 200, 200);
 
-  if(bIsDebugMode){
+  if (bIsDebugMode) {
     push();
     fill('black');
     text(nfs(frameRate(), 3, 1), 100, 100);
@@ -87,7 +87,7 @@ function mouseClicked() {
   }
 }
 
-function touchStarted(){
+function touchStarted() {
   swipeControlStart();
 }
 
@@ -103,44 +103,49 @@ function mouseReleased() {
   swipeControlEnd();
 }
 
-function swipeControlStart(){
+function swipeControlStart() {
   mouseDown = createVector(mouseX, mouseY);//store the position of the mouse when it is pressed
 }
 
-function swipeControlEnd(){
+function swipeControlEnd() {
   if (mouseDown != undefined) {
     let mouseVec = createVector(mouseX, mouseY);//get current mouse or touch location
     mouseVec.sub(mouseDown);//result vector is the direction of the swipe
     mouseDown = undefined;//clear mouseDown because I don't want strange edge cases where mouseReleased is called twice (trust issues)
-  
-    push();
-    angleMode(RADIANS);//just in case we aren't in radians mode
-    let result = map(mouseVec.heading(), -PI, PI, 0, 4);//convert to 4 cardinal directions
-    result = round(result, 0);//round to nearest whole number
-    result %= 4; //4 and 0 are the same direction
-    pop();
-  
-  
-    switch (result) {
-      case 0:
-        //left
-        if (game.state == 'play') game.board.worm.changeDirection(LEFT);
-        break;
-      case 1:
-        //up
-        if (game.state == 'play') game.board.worm.changeDirection(UP);
-        break;
-      case 2:
-        //right
-        if (game.state == 'play') game.board.worm.changeDirection(RIGHT);
-        break;
-      case 3:
-        //down
-        if (game.state == 'play') game.board.worm.changeDirection(DOWN);
-        break;
-      default:
-        console.log("some wrong vector from mouse drag or touch swipe");
-        break;
+    if (mouseVec.mag() > 2) {
+
+      push();
+      angleMode(RADIANS);//just in case we aren't in radians mode
+      let result = map(mouseVec.heading(), -PI, PI, 0, 4);//convert to 4 cardinal directions
+      result = round(result, 0);//round to nearest whole number
+      result %= 4; //4 and 0 are the same direction
+      pop();
+
+
+      switch (result) {
+        case 0:
+          //left
+          if (game.state == 'play') game.board.worm.changeDirection(LEFT);
+          break;
+        case 1:
+          //up
+          if (game.state == 'play') game.board.worm.changeDirection(UP);
+          break;
+        case 2:
+          //right
+          if (game.state == 'play') game.board.worm.changeDirection(RIGHT);
+          break;
+        case 3:
+          //down
+          if (game.state == 'play') game.board.worm.changeDirection(DOWN);
+          break;
+        default:
+          console.log("some wrong vector from mouse drag or touch swipe");
+          break;
+      }
+    } else {
+      let fs = fullscreen();
+      fullscreen(!fs);
     }
   }
 }
