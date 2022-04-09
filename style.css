@@ -3,7 +3,10 @@ html, body {
   padding: 0;
 }
 canvas {
-  display: block;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 #worm-game {

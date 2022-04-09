@@ -82,24 +82,40 @@ function mouseClicked() {
   }
 }
 
+function touchStarted(){
+  swipeControlStart();
+}
+
 function mousePressed() {
-  mouseDown = createVector(mouseX, mouseY);//store the position of the mouse when it is pressed
+  swipeControlStart();
+}
+
+function touchEnded() {
+  swipeControlEnd();
 }
 
 function mouseReleased() {
+  swipeControlEnd();
+}
+
+function swipeControlStart(){
+  mouseDown = createVector(mouseX, mouseY);//store the position of the mouse when it is pressed
+}
+
+function swipeControlEnd(){
   if (mouseDown != undefined) {
     let mouseVec = createVector(mouseX, mouseY);//get current mouse or touch location
     mouseVec.sub(mouseDown);//result vector is the direction of the swipe
     mouseDown = undefined;//clear mouseDown because I don't want strange edge cases where mouseReleased is called twice (trust issues)
-
+  
     push();
     angleMode(RADIANS);//just in case we aren't in radians mode
     let result = map(mouseVec.heading(), -PI, PI, 0, 4);//convert to 4 cardinal directions
     result = round(result, 0);//round to nearest whole number
     result %= 4; //4 and 0 are the same direction
     pop();
-
-
+  
+  
     switch (result) {
       case 0:
         //left
