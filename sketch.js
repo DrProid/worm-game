@@ -5,8 +5,8 @@ const UP = 'up';
 const DOWN = 'down';
 
 let mouseDown;
-let bIsDebugMode = false;
-let version = "0.11";
+let bIsDebugMode = true;
+let version = "0.12";
 
 var divWidth = document.getElementById('worm-game').offsetWidth;
 var divHeight = document.getElementById('worm-game').offsetHeight;
@@ -23,16 +23,16 @@ function draw() {
   game.update();
   game.draw();
 
-  text(version, 20, 20)
-  text(width, 60, 60);
-  text(height, 160, 100);
-  text(windowWidth, 60, 200);
-  text(windowHeight, 160, 200);
-
+  
   if (bIsDebugMode) {
     push();
     fill('black');
-    text(nfs(frameRate(), 3, 1), 100, 100);
+    text(version, 20, 20)
+    text(width, 60, 60);
+    text(height, 160, 60);
+    text(windowWidth, 60, 100);
+    text(windowHeight, 160, 100);
+    text(nfs(frameRate(), 3, 1), 100, 20);
     pop();
   }
 
@@ -147,7 +147,7 @@ function swipeControlEnd() {
       }
     } else {
       // let fs = fullscreen();
-      fullscreen(true);
+      // fullscreen(true);
     }
   }
 }
