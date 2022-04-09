@@ -101,6 +101,7 @@ class Worm {
     //draws the worm
     draw(rows, cols, gridSize, xBorder, yBorder, animPercent) {
         push();
+
         let numSegments = this.wormBody.length;
         let numSubSegments = 5;
         let totalSubSegments = numSubSegments * numSegments;
@@ -123,15 +124,13 @@ class Worm {
 
         //make a set of points along a smooth line
         const curve = new THREE.SplineCurve(threeSpline);
-        // const curve = new THREE.CubicBezierCurve(threeSpline);
-        // const curve = new THREE.QuadraticBezierCurve(threeSpline);
-        
+
         //draw body segments
         for (let i = numSegments; i > 0; i--) {
             //start from the tail
 
             // fill('salmon');
-            strokeWeight(gridSize/15);
+            strokeWeight(gridSize / 15);
             // stroke('tomato');
             // stroke('black');
             fill('#e5a7a7');
@@ -148,7 +147,7 @@ class Worm {
             for (let s = numSubSegments - 1; s >= (bIsHead ? numSubSegments - 1 : 0); s--) {
                 let subSegIndex = s + (i - 1) * numSubSegments;
                 let subSegPct = (subSegIndex + 1) / totalSubSegments;
-                // print(subSegPct);
+
                 let extendAnim = 2;
                 let alpha = lerp(-1, extendAnim, 1 - animPercent);
                 let rateOfChange = 1.8;
@@ -156,116 +155,14 @@ class Worm {
                 alpha = (alpha * -1) + 1;
 
                 subSegPct -= lerp(0, maxPctOffsetOnSpline, alpha);
-                
+
                 let pos = curve.getPointAt(subSegPct);
                 ellipse(pos.x, pos.y, gridSize);
             }
-            // noLoop();
 
-            // let direction;
-            // if (currX == nextX) {
-            //     if (currY < nextY) {
-            //         direction = DOWN;
-            //     } else {
-            //         direction = UP;
-            //     }
-            // } else {
-            //     if (currX < nextX) {
-            //         direction = RIGHT;
-            //     } else {
-            //         direction = LEFT;
-            //     }
-            // }
-
-            // console.log(totalSubSegments);
-            // let maxOffset = gridSize/numSubSegments;
-
-            // let textOff = 50;//debug
-            // for (let s = numSubSegments - 1; s >= 0; s--) {
-
-            //     let subSegIndex = s + (i - 1) * numSubSegments;
-            //     let segIndex = (numSubSegments - s - 1) / (numSubSegments);
-
-            //     let xPos = lerp(currX, nextX, segIndex);
-            //     let yPos = lerp(currY, nextY, segIndex);
-
-            //     // maxOffset = lerp(gridSize, gridSize / numSubSegments, subSegIndex / totalSubSegments);
-            //     let extendAnim = 2;
-            //     let alpha = lerp(-1, extendAnim, 1 - animPercent);
-            //     let rateOfChange = 1.7
-            //     alpha = constrain(-pow(-alpha + rateOfChange * subSegIndex / totalSubSegments, 3) + 1, 0, 1);
-            //     alpha = (alpha * -1) + 1;
-
-            //     // xPos += lerp(0, maxOffset, alpha);
-
-            //     switch (direction) {
-            //         case LEFT:
-            //             xPos -= lerp(0, maxOffset, alpha);
-            //             break;
-            //         case RIGHT:
-            //             xPos += lerp(0, maxOffset, alpha);
-            //             break;
-            //         case DOWN:
-            //             yPos += lerp(0, maxOffset, alpha);
-            //             break;
-            //         case UP:
-            //             yPos -= lerp(0, maxOffset, alpha);
-            //             break;
-            //     }
-
-            //     if (s == 0) {
-            //         fill('cyan');
-            //     }
-            //     ellipse(xPos, yPos, gridSize);
-            //     // ellipse(currX, currY, gridSize);
-            //     // ellipse(nextX, nextY, gridSize);
-
-            //     //debug
-            //     // text(s, currX, currY + textOff);
-            //     // textOff += 50;
-            //     // text(alpha, currX, currY + textOff);
-            //     // textOff += 50;
-            //     // text(subSegIndex, currX, currY + textOff);
-            //     // textOff += 50;
-            // }
 
         }
 
-
-        // {
-        //     fill('green');//green head
-        //     //draw the head
-        //     let xPos = map(this.wormBody[0].x, 0, cols, xBorder + gridSize / 2, width - xBorder + gridSize / 2);
-        //     let yPos = map(this.wormBody[0].y, 0, rows, yBorder + gridSize / 2, height - yBorder + gridSize / 2);
-
-        //     let extendAnim = 2;
-        //     let alpha = lerp(-1, extendAnim, 1 - animPercent);
-        //     let rateOfChange = 1.7
-        //     alpha = constrain(-pow(-alpha, 3) + 1, 0, 1);
-        //     alpha = (alpha * -1) + 1;
-
-        //     switch (this.direction) {
-        //         case LEFT:
-        //             xPos -= lerp(0, maxOffset, alpha);
-        //             break;
-        //         case RIGHT:
-        //             xPos += lerp(0, maxOffset, alpha);
-        //             break;
-        //         case DOWN:
-        //             yPos += lerp(0, maxOffset, alpha);
-        //             break;
-        //         case UP:
-        //             yPos -= lerp(0, maxOffset, alpha);
-        //             break;
-        //     }
-        //     ellipse(xPos, yPos, gridSize);
-        // }
-
-        //debug line
-        // var splinePoints = curve.getSpacedPoints(totalSubSegments);
-        // for (let i = 0; i < splinePoints.length; i++) {
-        //     ellipse(splinePoints[i].x, splinePoints[i].y, 10);
-        // }
         pop();
     }
 

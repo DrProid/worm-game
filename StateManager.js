@@ -146,7 +146,7 @@ if (typeof document.addEventListener === "undefined" || hidden === undefined) {
 
 function handleVisibilityChange() {
   if (document[hidden]) {
-    game.togglePause('pause');
+    if(game.state == 'play') game.togglePause('pause');
   }
 }
 

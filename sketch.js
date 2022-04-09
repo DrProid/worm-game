@@ -18,12 +18,16 @@ function draw() {
 
   game.update();
   game.draw();
-
+  fill('black');
+  text(frameRate().toFixed(0), 100, 100);
 }
 
 function windowResized() {
   divWidth = document.getElementById('worm-game').offsetWidth;
   divHeight = document.getElementById('worm-game').offsetHeight;
+  if(game.state == 'play'){
+    game.togglePause('pause');
+  }
   resizeCanvas(divWidth, divHeight);
   game.board.calculateBoardWindow(width, height);
 }
@@ -53,5 +57,11 @@ function keyPressed() {
     default:
       console.log("Some other key pressed. keycode = " + keyCode);
       break;
+  }
+}
+
+function mouseClicked(){
+  if(game.state=='ready'){
+    game.startGame();
   }
 }
