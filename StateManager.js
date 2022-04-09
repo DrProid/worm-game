@@ -35,6 +35,9 @@ class StateManager {
     }
 
     draw() {
+      if(this.state == 'ready'){
+        text("Start Game", width/2,height/2);
+      }
       if(this.state == 'play' || this.state == 'pause'){
         this.board.draw();
       }
