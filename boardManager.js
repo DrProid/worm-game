@@ -32,21 +32,25 @@ class BoardManager {
         //draw board
         let wideBorder = (width - (this.cols * this.gridSize)) / 2;
         let highBorder = (height - (this.rows * this.gridSize)) / 2;
-        //debug lines
-        for (let i = 0; i <= this.cols; i++) {
-            let xPos = map(i, 0, this.cols, wideBorder, width - wideBorder);
-            line(xPos, highBorder, xPos, height - highBorder);
-        }
-        for (let i = 0; i <= this.rows; i++) {
-            let yPos = map(i, 0, this.rows, highBorder, height - highBorder);
-            line(wideBorder, yPos, width - wideBorder, yPos);
-        }
 
-        //debug squares
-        fill('red');
-        rect(wideBorder, highBorder, this.gridSize);
-        fill('yellow');
-        rect(width - wideBorder - this.gridSize, height - highBorder - this.gridSize, this.gridSize);
+        if (bIsDebugMode) {
+            push();
+            //debug lines
+            for (let i = 0; i <= this.cols; i++) {
+                let xPos = map(i, 0, this.cols, wideBorder, width - wideBorder);
+                line(xPos, highBorder, xPos, height - highBorder);
+            }
+            for (let i = 0; i <= this.rows; i++) {
+                let yPos = map(i, 0, this.rows, highBorder, height - highBorder);
+                line(wideBorder, yPos, width - wideBorder, yPos);
+            }
+            //debug squares
+            fill('red');
+            rect(wideBorder, highBorder, this.gridSize);
+            fill('yellow');
+            rect(width - wideBorder - this.gridSize, height - highBorder - this.gridSize, this.gridSize);
+            pop();
+        }
 
         //draw all foods
 
@@ -162,7 +166,20 @@ class Worm {
 
 
         }
-
+        if (bIsDebugMode) {
+            push();
+            //debug line
+            // console.log(curve);
+            stroke('cyan');
+            noFill();
+            beginShape();
+            for (let i = 0; i < 1 - maxPctOffsetOnSpline; i += 0.01) {
+                let pos = curve.getPointAt(i);
+                vertex(pos.x, pos.y);
+            }
+            endShape();
+            pop();
+        }
         pop();
     }
 

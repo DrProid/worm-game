@@ -43,7 +43,7 @@ class StateManager {
       }
       if(this.state == 'pause'){
         //replace this with a pause dialogue and button
-        text("Press enter to Unpause", width/2,height/2);
+        text("Press enter or click to Unpause", width/2,height/2);
       }
     }
   
