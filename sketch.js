@@ -6,7 +6,7 @@ const DOWN = 'down';
 
 let mouseDown;
 let bIsDebugMode = true;
-let version = "0.12";
+let version = "0.13";
 
 var divWidth = document.getElementById('worm-game').offsetWidth;
 var divHeight = document.getElementById('worm-game').offsetHeight;
@@ -30,8 +30,10 @@ function draw() {
     text(version, 20, 20)
     text(width, 60, 60);
     text(height, 160, 60);
-    text(windowWidth, 60, 100);
-    text(windowHeight, 160, 100);
+    text(windowWidth, 60, 80);
+    text(windowHeight, 160, 80);
+    text(displayWidth, 60, 100);
+    text(displayHeight, 160, 100);
     text(nfs(frameRate(), 3, 1), 100, 20);
     pop();
   }
