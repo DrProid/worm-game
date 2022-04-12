@@ -4,9 +4,12 @@ let game;
 const UP = 'up';
 const DOWN = 'down';
 
+const CLICK = "click";
+const HOLD = "hold";
+
 let mouseDown;
 let bIsDebugMode = true;
-let version = "0.13";
+let version = "0.14";
 
 var divWidth = document.getElementById('worm-game').offsetWidth;
 var divHeight = document.getElementById('worm-game').offsetHeight;
@@ -15,6 +18,18 @@ function setup() {
   var cnv = createCanvas(divWidth, divHeight);
   cnv.parent("worm-game");
   game = new StateManager();
+
+  let parentPos = { xOff: 0, yOff: 0 };
+  let parentDim = { width: width, height: height };
+  let anchor = defaultAnchor();
+  anchor.xOffPct = 0.5;
+  anchor.yOffPct = 0.5;
+  anchor.horz = CENTER;
+  anchor.vert = CENTER;
+  game.addUI("welcome", parentPos, parentDim, anchor);
+  game.uiElements.welcome.addButtonElement("start", anchor, "START", () => { game.startGame(); });
+
+  game.changeState('ready');
 }
 
 function draw() {
@@ -23,7 +38,7 @@ function draw() {
   game.update();
   game.draw();
 
-  
+
   if (bIsDebugMode) {
     push();
     fill('black');
@@ -47,10 +62,12 @@ function windowResized() {
     game.togglePause('pause');
   }
   resizeCanvas(divWidth, divHeight);
-  game.board.calculateBoardWindow(width, height);
+  game.handleResize(width, height);
+
 }
 
-//controls input
+/******************************* CONTROLS INPUT ***********************************/
+
 function keyPressed() {
   switch (keyCode) {
     case LEFT_ARROW:
@@ -78,18 +95,18 @@ function keyPressed() {
   }
 }
 
-function mouseClicked() {
-  switch (game.state) {
-    case 'ready':
-      game.startGame();
-      break;
-    case 'pause':
-      game.togglePause();
-      break;
-    default:
-      break;
-  }
-}
+// function mouseClicked() {
+//   switch (game.state) {
+//     case 'ready':
+//       game.startGame();
+//       break;
+//     case 'pause':
+//       game.togglePause();
+//       break;
+//     default:
+//       break;
+//   }
+// }
 
 function touchStarted() {
   swipeControlStart();
@@ -112,7 +129,9 @@ function swipeControlStart() {
 }
 
 function swipeControlEnd() {
-  if (mouseDown != undefined) {
+
+  if (mouseDown != undefined && game.state == 'play') { //game swipe controls
+
     let mouseVec = createVector(mouseX, mouseY);//get current mouse or touch location
     mouseVec.sub(mouseDown);//result vector is the direction of the swipe
     mouseDown = undefined;//clear mouseDown because I don't want strange edge cases where mouseReleased is called twice (trust issues)
@@ -147,9 +166,11 @@ function swipeControlEnd() {
           console.log("some wrong vector from mouse drag or touch swipe");
           break;
       }
-    } else {
-      // let fs = fullscreen();
-      // fullscreen(true);
     }
+  } else {
+    game.checkButtons(mouseX, mouseY, CLICK);
+    // let fs = fullscreen();
+    // fullscreen(true);
+
   }
 }
