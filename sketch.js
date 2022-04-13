@@ -9,7 +9,7 @@ const HOLD = "hold";
 
 let mouseDown;
 let bIsDebugMode = true;
-let version = "0.14";
+let version = "0.15";
 
 var divWidth = document.getElementById('worm-game').offsetWidth;
 var divHeight = document.getElementById('worm-game').offsetHeight;
