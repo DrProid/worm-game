@@ -19,15 +19,8 @@ function setup() {
   cnv.parent("worm-game");
   game = new StateManager();
 
-  let parentPos = { xOff: 0, yOff: 0 };
-  let parentDim = { width: width, height: height };
-  let anchor = defaultAnchor();
-  anchor.xOffPct = 0.5;
-  anchor.yOffPct = 0.5;
-  anchor.horz = CENTER;
-  anchor.vert = CENTER;
-  game.addUI("welcome", parentPos, parentDim, anchor);
-  game.uiElements.welcome.addButtonElement("start", anchor, "START", () => { game.startGame(); });
+  makeWelcomeUI();
+  makePauseUI();
 
   game.changeState('ready');
 }
@@ -64,6 +57,32 @@ function windowResized() {
   resizeCanvas(divWidth, divHeight);
   game.handleResize(width, height);
 
+}
+
+/******************************* UI CREATORS ***********************************/
+
+function makeWelcomeUI(){
+  let parentPos = { xOff: 0, yOff: 0 };
+  let parentDim = { width: width, height: height };
+  let anchor = defaultAnchor();
+  anchor.xOffPct = 0.5;
+  anchor.yOffPct = 0.5;
+  anchor.horz = CENTER;
+  anchor.vert = CENTER;
+  game.addUI("welcome", parentPos, parentDim, anchor);
+  game.uiElements.welcome.addButtonElement("start", anchor, "START", () => { game.startGame(); });
+}
+
+function makePauseUI(){
+  let parentPos = { xOff: 0, yOff: 0 };
+  let parentDim = { width: width, height: height };
+  let anchor = defaultAnchor();
+  anchor.xOffPct = 0.5;
+  anchor.yOffPct = 0.5;
+  anchor.horz = CENTER;
+  anchor.vert = CENTER;
+  game.addUI("pause", parentPos, parentDim, anchor);
+  game.uiElements.pause.addButtonElement("unpause", anchor, "UNPAUSE", () => { game.togglePause(); });
 }
 
 /******************************* CONTROLS INPUT ***********************************/

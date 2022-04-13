@@ -62,9 +62,10 @@ class StateManager {
         break;
       case 'play':
         this.uiElements.welcome.setVisible(false);
+        this.uiElements.pause.setVisible(false);
         break;
       case 'pause':
-        this.uiElements.welcome.setVisible(true);
+        this.uiElements.pause.setVisible(true);
         break;
       default:
         console.error("unknown state sent to changeState : " + state);
