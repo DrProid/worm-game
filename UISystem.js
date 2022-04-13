@@ -15,6 +15,8 @@ class UI {
             //yOffPct (offset from anchor as percent of parent height)
             //widthPct (width percent of parent)
             //heightPct (height percent of parent)
+            //widthRatio (undefined if not used, multiplier of height to maintain ratio)
+            //heightRatio (undefined if not used, multiplier of width to maintain ratio)
     
         //dim (object)
             //width (pixels calculated)
@@ -41,6 +43,13 @@ class UI {
         this.dim.width = parentDim.width * this.anchor.widthPct;
         this.dim.height = parentDim.height * this.anchor.heightPct;
 
+        //only one ratio can be used, width takes priority if both are set (don't set both)
+        if(this.anchor.widthRatio != undefined){
+            this.dim.width = this.anchor.widthRatio * this.dim.height;
+        } else if (this.anchor.heightRatio != undefined){
+            this.dim.height = this.anchor.heightRatio * this.dim.width;
+        }
+
         //adjust for non-left anchors
         if (this.anchor.horz == CENTER) {
             this.pos.xOff -= this.dim.width / 2;
@@ -63,7 +72,7 @@ class UI {
         if (this.visible) {
             push();
             rectMode(CORNER);
-            rect(this.pos.xOff, this.pos.yOff, this.dim.width, this.dim.height);
+            rect(this.pos.xOff, this.pos.yOff, this.dim.width, this.dim.height, 5);
             pop();
         }
     }
@@ -134,7 +143,7 @@ class ButtonElement extends TextElement {
         this.bCanClick = true;
         this.bCanHold = false;
     }
-    checkButtons(xPos, yPos, type) {
+    checkButtons(xPos, yPos, type = CLICK) {
         switch (type) {
             case CLICK:
                 this.checkClick(xPos, yPos);
@@ -147,7 +156,7 @@ class ButtonElement extends TextElement {
                 break;
         }
     }
-    checkHold(xPos, yPos) {
+    checkHold(xPos, yPos) {//I don't think we need this but I put it in anyway.
         if (this.bCanHold && this.isOverElement(xPos, yPos)) {
             this.callback();
         }
@@ -162,6 +171,8 @@ class ButtonElement extends TextElement {
     }
 }
 
+/******************************* UI CREATORS ***********************************/
+
 function defaultAnchor() {
     //anchor (object)
     //horz (which side to anchor to LEFT CENTER RIGHT)
@@ -170,5 +181,41 @@ function defaultAnchor() {
     //yOffPct (offset from anchor as percent of parent height)
     //widthPct (width percent of parent)
     //heightPct (height percent of parent)
-    return { horz: LEFT, vert: TOP, xOffPct: 0, yOffPct: 0, widthPct: 0.25, heightPct: 0.25 };
+    return { horz: LEFT, vert: TOP, xOffPct: 0, yOffPct: 0, widthPct: 0.25, heightPct: 0.25, widthRatio: undefined, heightRatio: undefined};
 }
+
+function fullScreenPos(){
+    return { xOff: 0, yOff: 0 };
+}
+
+function fullScreenDim(){
+    return { width: width, height: height };
+}
+
+function makeWelcomeUI(){
+    let anchor = defaultAnchor();
+    anchor.xOffPct = 0.5;
+    anchor.yOffPct = 0.5;
+    anchor.horz = CENTER;
+    anchor.vert = CENTER;
+    game.addUI("welcome", fullScreenPos(), fullScreenDim(), anchor);
+    let btnAnchor = {...anchor}; //shallow copy the anchor
+    btnAnchor.heightRatio = 1/3;
+    game.uiElements.welcome.addButtonElement("start", btnAnchor, "START", () => { 
+        game.startGame(); 
+    });
+  }
+  
+  function makePauseUI(){
+    let anchor = defaultAnchor();
+    anchor.xOffPct = 0.5;
+    anchor.yOffPct = 0.5;
+    anchor.horz = CENTER;
+    anchor.vert = CENTER;
+    game.addUI("pause", fullScreenPos(), fullScreenDim(), anchor);
+    let btnAnchor = {...anchor}; //shallow copy the anchor
+    btnAnchor.heightRatio = 1/3;
+    game.uiElements.pause.addButtonElement("unpause", btnAnchor, "UNPAUSE", () => { 
+        game.togglePause(); 
+    });
+  }

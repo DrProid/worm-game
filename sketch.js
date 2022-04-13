@@ -9,10 +9,17 @@ const HOLD = "hold";
 
 let mouseDown;
 let bIsDebugMode = true;
-let version = "0.15";
+let version = "v0.15";
 
 var divWidth = document.getElementById('worm-game').offsetWidth;
 var divHeight = document.getElementById('worm-game').offsetHeight;
+
+var sound;
+function preload(){
+  sound = new Howl({
+    src: ['WORMS_UNMIXED_01.mp3']
+  });
+}
 
 function setup() {
   var cnv = createCanvas(divWidth, divHeight);
@@ -23,6 +30,8 @@ function setup() {
   makePauseUI();
 
   game.changeState('ready');
+
+  sound.play();
 }
 
 function draw() {
@@ -59,46 +68,24 @@ function windowResized() {
 
 }
 
-/******************************* UI CREATORS ***********************************/
-
-function makeWelcomeUI(){
-  let parentPos = { xOff: 0, yOff: 0 };
-  let parentDim = { width: width, height: height };
-  let anchor = defaultAnchor();
-  anchor.xOffPct = 0.5;
-  anchor.yOffPct = 0.5;
-  anchor.horz = CENTER;
-  anchor.vert = CENTER;
-  game.addUI("welcome", parentPos, parentDim, anchor);
-  game.uiElements.welcome.addButtonElement("start", anchor, "START", () => { game.startGame(); });
-}
-
-function makePauseUI(){
-  let parentPos = { xOff: 0, yOff: 0 };
-  let parentDim = { width: width, height: height };
-  let anchor = defaultAnchor();
-  anchor.xOffPct = 0.5;
-  anchor.yOffPct = 0.5;
-  anchor.horz = CENTER;
-  anchor.vert = CENTER;
-  game.addUI("pause", parentPos, parentDim, anchor);
-  game.uiElements.pause.addButtonElement("unpause", anchor, "UNPAUSE", () => { game.togglePause(); });
-}
-
 /******************************* CONTROLS INPUT ***********************************/
 
 function keyPressed() {
   switch (keyCode) {
     case LEFT_ARROW:
+    case 65: //A
       if (game.state == 'play') game.board.worm.changeDirection(LEFT);
       break;
     case RIGHT_ARROW:
+    case 68: //D
       if (game.state == 'play') game.board.worm.changeDirection(RIGHT);
       break;
     case UP_ARROW:
+    case 87: //W
       if (game.state == 'play') game.board.worm.changeDirection(UP);
       break;
     case DOWN_ARROW:
+    case 83: //S
       if (game.state == 'play') game.board.worm.changeDirection(DOWN);
       break;
     case ENTER:
@@ -187,7 +174,7 @@ function swipeControlEnd() {
       }
     }
   } else {
-    game.checkButtons(mouseX, mouseY, CLICK);
+    game.checkButtons(mouseX, mouseY);
     // let fs = fullscreen();
     // fullscreen(true);
 
