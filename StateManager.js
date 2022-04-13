@@ -16,8 +16,8 @@ class StateManager {
     //   bCanStore = true;
     //   checkStorage();
     // }
-    this.uiElements = {};
-    
+    this.overBoardUIElements = {};
+    this.underBoardUIElements = {};
   }
 
   startGame() {
@@ -40,32 +40,48 @@ class StateManager {
 
     let parentPos = { xOff: 0, yOff: 0 };
     let parentDim = { width: width, height: height };
-    for (let name in this.uiElements) {
-      this.uiElements[name].calculateWindow(parentPos, parentDim)
+    for (let name in this.underBoardUIElements) {
+      this.underBoardUIElements[name].calculateWindow(parentPos, parentDim)
+    }
+    for (let name in this.overBoardUIElements) {
+      this.overBoardUIElements[name].calculateWindow(parentPos, parentDim)
     }
   }
 
-  addUI(name, parentPos, parentDim, anchor) {
-    this.uiElements[name] = new UIContainer(parentPos, parentDim, anchor);
+  addUI(name, parentPos, parentDim, anchor, bIsOver = true) {
+    if(bIsOver){
+      this.overBoardUIElements[name] = new UIContainer(parentPos, parentDim, anchor);
+    } else {
+      this.underBoardUIElements[name] = new UIContainer(parentPos, parentDim, anchor);
+    }
   }
 
   checkButtons(xPos, yPos, type) {
-    for (let name in this.uiElements) {
-      this.uiElements[name].checkButtons(xPos, yPos, type);
+    let bButtonWasClicked = false;
+    for (let name in this.overBoardUIElements) {
+      if(this.overBoardUIElements[name].checkButtons(xPos, yPos, type)){
+        bButtonWasClicked = true;
+      }
     }
+    for (let name in this.underBoardUIElements) {
+      if(this.underBoardUIElements[name].checkButtons(xPos, yPos, type)){
+        bButtonWasClicked = true;
+      }
+    }
+    return bButtonWasClicked;
   }
 
   changeState(state) {
     switch (state) {
       case 'ready':
-        this.uiElements.welcome.setVisible(true);
+        this.overBoardUIElements.welcome.setVisible(true);
         break;
       case 'play':
-        this.uiElements.welcome.setVisible(false);
-        this.uiElements.pause.setVisible(false);
+        this.overBoardUIElements.welcome.setVisible(false);
+        this.overBoardUIElements.pause.setVisible(false);
         break;
       case 'pause':
-        this.uiElements.pause.setVisible(true);
+        this.overBoardUIElements.pause.setVisible(true);
         break;
       default:
         console.error("unknown state sent to changeState : " + state);
@@ -74,6 +90,11 @@ class StateManager {
   }
 
   draw() {
+    //draw all of the UI that apears under game board
+    for (let key in this.underBoardUIElements) {
+      this.underBoardUIElements[key].draw();
+    }
+
     // if (this.state == 'ready') {
     //   // text("Start Game", width / 2, height / 2);
     //   this.uiElements.welcome.setVisible(true);
@@ -86,9 +107,9 @@ class StateManager {
     //   // text("Press enter or click to Unpause", width / 2, height / 2);
     // }
 
-    //draw all of the UI
-    for (let key in this.uiElements) {
-      this.uiElements[key].draw();
+    //draw all of the UI that apears on top of game board
+    for (let key in this.overBoardUIElements) {
+      this.overBoardUIElements[key].draw();
     }
   }
 

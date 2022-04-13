@@ -146,10 +146,10 @@ class ButtonElement extends TextElement {
     checkButtons(xPos, yPos, type = CLICK) {
         switch (type) {
             case CLICK:
-                this.checkClick(xPos, yPos);
+                return this.checkClick(xPos, yPos);
                 break;
             case HOLD:
-                this.checkHold(xPos, yPos);
+                return this.checkHold(xPos, yPos);
                 break;
             default:
                 console.error("strange type sent to checkButtons : " + type);
@@ -159,15 +159,16 @@ class ButtonElement extends TextElement {
     checkHold(xPos, yPos) {//I don't think we need this but I put it in anyway.
         if (this.bCanHold && this.isOverElement(xPos, yPos)) {
             this.callback();
+            return true;
         }
     }
     checkClick(xPos, yPos) {
         if (this.bCanClick && this.isOverElement(xPos, yPos)) {
             this.callback();
+            return true;
         }
     }
     isOverElement(x, y) {
-        console.log(x, y, this.pos.xOff, this.pos.yOff);
         return x > this.pos.xOff && x < this.pos.xOff + this.dim.width && y > this.pos.yOff && y < this.pos.yOff + this.dim.height;
     }
 }
@@ -202,10 +203,7 @@ function makeWelcomeUI() {
     game.addUI("welcome", fullScreenPos(), fullScreenDim(), anchor);
     let btnAnchor = { ...anchor }; //shallow copy the anchor
     btnAnchor.heightRatio = 1 / 3;
-    game.uiElements.welcome.addButtonElement("start", btnAnchor, "START", () => {
-        if (isMobile) {
-            fullscreen(true);
-        }
+    game.overBoardUIElements.welcome.addButtonElement("start", btnAnchor, "START", () => {
         game.startGame();
     });
 }
@@ -219,7 +217,33 @@ function makePauseUI() {
     game.addUI("pause", fullScreenPos(), fullScreenDim(), anchor);
     let btnAnchor = { ...anchor }; //shallow copy the anchor
     btnAnchor.heightRatio = 1 / 3;
-    game.uiElements.pause.addButtonElement("unpause", btnAnchor, "UNPAUSE", () => {
+    game.overBoardUIElements.pause.addButtonElement("unpause", btnAnchor, "UNPAUSE", () => {
         game.togglePause();
     });
+}
+
+let bIsMobileFullscreen = false;
+
+function makeDesktop(){
+    let anchor = defaultAnchor();
+    anchor.xOffPct = 0;
+    anchor.yOffPct = 0;
+    anchor.horz = LEFT;
+    anchor.vert = TOP;
+    anchor.widthPct = 1;
+    anchor.heightPct = 1;
+    game.addUI("desktop", fullScreenPos(), fullScreenDim(), anchor, false);
+
+    let btnAnchor = { ...anchor }; //shallow copy the anchor
+    btnAnchor.xOffPct = 1;
+    btnAnchor.yOffPct = 0;
+    btnAnchor.horz = RIGHT;
+    btnAnchor.widthPct = 0.05;
+    btnAnchor.heightRatio = 1;
+    game.underBoardUIElements.desktop.addButtonElement("fullscreen", btnAnchor, "F", () => {
+        bIsMobileFullscreen = !bIsMobileFullscreen;
+        bSuppressPause = true;
+        fullscreen(bIsMobileFullscreen);
+    });
+    game.underBoardUIElements.desktop.setVisible(true);
 }
