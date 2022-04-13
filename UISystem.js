@@ -44,9 +44,9 @@ class UI {
         this.dim.height = parentDim.height * this.anchor.heightPct;
 
         //only one ratio can be used, width takes priority if both are set (don't set both)
-        if(this.anchor.widthRatio != undefined){
+        if (this.anchor.widthRatio != undefined) {
             this.dim.width = this.anchor.widthRatio * this.dim.height;
-        } else if (this.anchor.heightRatio != undefined){
+        } else if (this.anchor.heightRatio != undefined) {
             this.dim.height = this.anchor.heightRatio * this.dim.width;
         }
 
@@ -65,7 +65,7 @@ class UI {
         }
 
     }
-    setVisible(bIsVisible){
+    setVisible(bIsVisible) {
         this.visible = bIsVisible;
     }
     draw() {
@@ -96,7 +96,7 @@ class UIContainer extends UI {
             this.elements[name].calculateWindow(this.pos, this.dim);
         }
     }
-    setVisible(bIsVisible){
+    setVisible(bIsVisible) {
         super.setVisible(bIsVisible);
         for (let name in this.elements) {
             this.elements[name].setVisible(bIsVisible);
@@ -167,6 +167,7 @@ class ButtonElement extends TextElement {
         }
     }
     isOverElement(x, y) {
+        console.log(x, y, this.pos.xOff, this.pos.yOff);
         return x > this.pos.xOff && x < this.pos.xOff + this.dim.width && y > this.pos.yOff && y < this.pos.yOff + this.dim.height;
     }
 }
@@ -181,41 +182,44 @@ function defaultAnchor() {
     //yOffPct (offset from anchor as percent of parent height)
     //widthPct (width percent of parent)
     //heightPct (height percent of parent)
-    return { horz: LEFT, vert: TOP, xOffPct: 0, yOffPct: 0, widthPct: 0.25, heightPct: 0.25, widthRatio: undefined, heightRatio: undefined};
+    return { horz: LEFT, vert: TOP, xOffPct: 0, yOffPct: 0, widthPct: 0.25, heightPct: 0.25, widthRatio: undefined, heightRatio: undefined };
 }
 
-function fullScreenPos(){
+function fullScreenPos() {
     return { xOff: 0, yOff: 0 };
 }
 
-function fullScreenDim(){
+function fullScreenDim() {
     return { width: width, height: height };
 }
 
-function makeWelcomeUI(){
+function makeWelcomeUI() {
     let anchor = defaultAnchor();
     anchor.xOffPct = 0.5;
     anchor.yOffPct = 0.5;
     anchor.horz = CENTER;
     anchor.vert = CENTER;
     game.addUI("welcome", fullScreenPos(), fullScreenDim(), anchor);
-    let btnAnchor = {...anchor}; //shallow copy the anchor
-    btnAnchor.heightRatio = 1/3;
-    game.uiElements.welcome.addButtonElement("start", btnAnchor, "START", () => { 
-        game.startGame(); 
+    let btnAnchor = { ...anchor }; //shallow copy the anchor
+    btnAnchor.heightRatio = 1 / 3;
+    game.uiElements.welcome.addButtonElement("start", btnAnchor, "START", () => {
+        if (isMobile) {
+            fullscreen(true);
+        }
+        game.startGame();
     });
-  }
-  
-  function makePauseUI(){
+}
+
+function makePauseUI() {
     let anchor = defaultAnchor();
     anchor.xOffPct = 0.5;
     anchor.yOffPct = 0.5;
     anchor.horz = CENTER;
     anchor.vert = CENTER;
     game.addUI("pause", fullScreenPos(), fullScreenDim(), anchor);
-    let btnAnchor = {...anchor}; //shallow copy the anchor
-    btnAnchor.heightRatio = 1/3;
-    game.uiElements.pause.addButtonElement("unpause", btnAnchor, "UNPAUSE", () => { 
-        game.togglePause(); 
+    let btnAnchor = { ...anchor }; //shallow copy the anchor
+    btnAnchor.heightRatio = 1 / 3;
+    game.uiElements.pause.addButtonElement("unpause", btnAnchor, "UNPAUSE", () => {
+        game.togglePause();
     });
-  }
+}

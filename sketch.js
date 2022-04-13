@@ -9,21 +9,25 @@ const HOLD = "hold";
 
 let mouseDown;
 let bIsDebugMode = true;
-let version = "v0.15";
+let version = "v0.16";
 
 var divWidth = document.getElementById('worm-game').offsetWidth;
 var divHeight = document.getElementById('worm-game').offsetHeight;
 
-var sound;
-function preload(){
-  sound = new Howl({
-    src: ['WORMS_UNMIXED_01.mp3'],
-    loop: true
-  });
-}
+let cnv;//canvas context
 
 function setup() {
-  var cnv = createCanvas(divWidth, divHeight);
+  if (isMobile && divHeight > divWidth) {
+    cnv = createCanvas(divHeight, divWidth);
+    cnv.elt.style.left = "50%";
+    cnv.elt.style.top = "50%";
+    cnv.elt.style.transform = 'translate(-50%,-50%) rotate(90deg)';
+  } else {
+    cnv = createCanvas(divWidth, divHeight);
+    cnv.elt.style.left = "50%";
+    cnv.elt.style.top = "50%";
+    cnv.elt.style.transform = 'translate(-50%,-50%)';
+  }
   cnv.parent("worm-game");
   game = new StateManager();
 
@@ -32,7 +36,6 @@ function setup() {
 
   game.changeState('ready');
 
-  sound.play();
 }
 
 function draw() {
@@ -64,7 +67,13 @@ function windowResized() {
   if (game.state == 'play') {
     game.togglePause('pause');
   }
-  resizeCanvas(divWidth, divHeight);
+  if (isMobile && divHeight > divWidth) {
+    resizeCanvas(divHeight, divWidth);
+    cnv.elt.style.transform = 'translate(-50%,-50%) rotate(90deg)';
+  } else {
+    resizeCanvas(divWidth, divHeight);
+    cnv.elt.style.transform = 'translate(-50%,-50%)';
+  }
   game.handleResize(width, height);
 
 }
@@ -148,6 +157,9 @@ function swipeControlEnd() {
       angleMode(RADIANS);//just in case we aren't in radians mode
       let result = map(mouseVec.heading(), -PI, PI, 0, 4);//convert to 4 cardinal directions
       result = round(result, 0);//round to nearest whole number
+      if(isMobile){
+        result += 3;
+      }
       result %= 4; //4 and 0 are the same direction
       pop();
 
@@ -175,9 +187,10 @@ function swipeControlEnd() {
       }
     }
   } else {
-    game.checkButtons(mouseX, mouseY);
-    // let fs = fullscreen();
-    // fullscreen(true);
-
+    if(isMobile){
+      game.checkButtons(mouseY, height-mouseX);
+    } else {
+      game.checkButtons(mouseX, mouseY);
+    }
   }
 }
