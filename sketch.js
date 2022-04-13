@@ -9,7 +9,7 @@ const HOLD = "hold";
 
 let mouseDown;
 let bIsDebugMode = true;
-let version = "v0.17";
+let version = "v0.18";
 
 let bSuppressPause = false;
 
@@ -19,18 +19,11 @@ var divHeight = document.getElementById('worm-game').offsetHeight;
 let cnv;//canvas context
 
 function setup() {
-  isMobile = true;
-  // if (isMobile && divHeight > divWidth) {
-  //   cnv = createCanvas(divHeight, divWidth);
-  //   cnv.elt.style.left = "50%";
-  //   cnv.elt.style.top = "50%";
-  //   cnv.elt.style.transform = 'translate(-50%,-50%) rotate(90deg)';
-  // } else {
   cnv = createCanvas(divWidth, divHeight);
   cnv.elt.style.left = "50%";
   cnv.elt.style.top = "50%";
   cnv.elt.style.transform = 'translate(-50%,-50%)';
-  // }
+
   cnv.parent("worm-game");
   game = new StateManager();
 

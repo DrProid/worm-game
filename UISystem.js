@@ -224,7 +224,7 @@ function makePauseUI() {
 
 let bIsMobileFullscreen = false;
 
-function makeDesktop(){
+function makeDesktop() {
     let anchor = defaultAnchor();
     anchor.xOffPct = 0;
     anchor.yOffPct = 0;
@@ -234,16 +234,19 @@ function makeDesktop(){
     anchor.heightPct = 1;
     game.addUI("desktop", fullScreenPos(), fullScreenDim(), anchor, false);
 
-    let btnAnchor = { ...anchor }; //shallow copy the anchor
-    btnAnchor.xOffPct = 1;
-    btnAnchor.yOffPct = 0;
-    btnAnchor.horz = RIGHT;
-    btnAnchor.widthPct = 0.05;
-    btnAnchor.heightRatio = 1;
-    game.underBoardUIElements.desktop.addButtonElement("fullscreen", btnAnchor, "F", () => {
-        bIsMobileFullscreen = !bIsMobileFullscreen;
-        bSuppressPause = true;
-        fullscreen(bIsMobileFullscreen);
-    });
+    if (isMobile) {
+        let btnAnchor = { ...anchor }; //shallow copy the anchor
+        btnAnchor.xOffPct = 1;
+        btnAnchor.yOffPct = 0;
+        btnAnchor.horz = RIGHT;
+        btnAnchor.widthPct = 0.05;
+        btnAnchor.heightRatio = 1;
+        game.underBoardUIElements.desktop.addButtonElement("fullscreen", btnAnchor, "F", () => {
+            bIsMobileFullscreen = !bIsMobileFullscreen;
+            bSuppressPause = true;
+            fullscreen(bIsMobileFullscreen);
+        });
+    }
+
     game.underBoardUIElements.desktop.setVisible(true);
 }
