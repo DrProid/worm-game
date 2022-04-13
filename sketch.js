@@ -17,7 +17,8 @@ var divHeight = document.getElementById('worm-game').offsetHeight;
 var sound;
 function preload(){
   sound = new Howl({
-    src: ['WORMS_UNMIXED_01.mp3']
+    src: ['WORMS_UNMIXED_01.mp3'],
+    loop: true
   });
 }
 
