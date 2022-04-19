@@ -3,7 +3,7 @@ var bgm = new Howl({
     loop: true
 });
 
-bgm.play();
+var backgroundMusic = bgm.play();
 
 //not much here yet. I don't know the architecture until I think of the neccesity
 //probably need something to queue track changes for the background music

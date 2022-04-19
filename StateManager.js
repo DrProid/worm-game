@@ -299,7 +299,14 @@ if (typeof document.addEventListener === "undefined" || hidden === undefined) {
 
 function handleVisibilityChange() {
   if (document[hidden]) {
-    if (game.state == 'play') game.togglePause('pause');
+    if (game.state == 'play') {
+      game.togglePause('pause');
+    }
+    bgm.pause(backgroundMusic);
+  } else {
+    if(!bgm.playing(backgroundMusic)){
+      var backgroundMusic = bgm.play();
+    }
   }
 }
 
