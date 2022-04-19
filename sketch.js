@@ -24,11 +24,11 @@ let imageList = {};
 
 function preload(){
   //desktop
-  imageList.bg = loadImage('./assets/images/UI_Background.png');
+  imageList.bg = loadImage('./assets/images/UI_BackGround.png');
   imageList.bucketIdle = loadImage('./assets/images/UI_Icon_Bucket_Idle.png');
   imageList.bucketClick = loadImage('./assets/images/UI_Icon_Bucket_Click.png');
-  imageList.wormGameIdle = loadImage('./assets/images/UI_Icon_wormgame_Idle.png');
-  imageList.wormGameClick = loadImage('./assets/images/UI_Icon_wormgame_Click.png');
+  imageList.wormGameIdle = loadImage('./assets/images/UI_Icon_wormgame_idle.png');
+  imageList.wormGameClick = loadImage('./assets/images/UI_Icon_wormgame_click.png');
 
   //game window
   imageList.gameWindow =  loadImage('./assets/images/UI_Window_Wormgame.png');
