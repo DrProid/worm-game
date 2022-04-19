@@ -80,8 +80,10 @@ class UI {
                 rectMode(CORNER);
                 rect(this.pos.xOff, this.pos.yOff, this.dim.width, this.dim.height, 5);
             }
-            imageMode(CORNER);
-            image(this.image, this.pos.xOff, this.pos.yOff, this.dim.width, this.dim.height);
+            if (this.image) {
+                imageMode(CORNER);
+                image(this.image, this.pos.xOff, this.pos.yOff, this.dim.width, this.dim.height);
+            }
             pop();
         }
     }
@@ -162,6 +164,8 @@ class BoardElement {
         this.goodFoodChance = 1;
         this.worm;
         this.timeKeeper = 0;
+        this.boost = 1;
+        this.maxBoost = 3;
         this.gameTick = 250;//milliseconds between actual changes to the board (not animations)
 
     }
@@ -204,7 +208,7 @@ class BoardElement {
         }
 
         //never near the player
-        if(dist(xPos, yPos, this.worm.wormBody[0].x, this.worm.wormBody[0].y) < 7){
+        if (dist(xPos, yPos, this.worm.wormBody[0].x, this.worm.wormBody[0].y) < 7) {
             bIsVacant = false;
         }
 
@@ -231,6 +235,8 @@ class BoardElement {
     }
     startGame() {
         this.spawnWorm(floor(this.cols / 2) - 1, floor(this.rows / 2) - 1);
+        this.boost = 1;
+        this.maxBoost = 3;
         // this.spawnWorm(50, 20);
     }
     draw() {
@@ -288,22 +294,31 @@ class BoardElement {
 
     }
     update(state) {
-        let collideData = { scoreChange: 0, lifeChange: 0 };;
+        let collideData = { foodChange: 0, scoreChange: 0 };
         if (state == 'play') {
-            this.timeKeeper += deltaTime;
+            this.timeKeeper += deltaTime * this.boost;
 
             //delete stale foods
             for (let i in this.foods) {
-                if (this.foods[i].timer <= millis()) {
+                this.foods[i].timer -= deltaTime;
+                if (this.foods[i].timer < 0) {
                     this.foods.splice(i, 1);
+                    i--;
                 }
             }
 
             //check for worm movement
             if (this.timeKeeper >= this.gameTick) {
                 this.timeKeeper -= this.gameTick;
-                collideData = this.checkCollision();
                 this.worm.move(false);
+                this.worm.headOverride = undefined;
+                collideData = this.checkCollision();
+                if(collideData.foodChange > 0){
+                    this.worm.headOverride = imageList.wormHeadGood;
+                } else if(collideData.foodChange < 0){
+                    this.worm.headOverride = imageList.wormHeadBad;
+                }
+                // console.log(collideData);
             } else {
                 if (this.foods.length < this.maxFood && random() < 0.05) {
                     this.spawnFood();
@@ -314,9 +329,22 @@ class BoardElement {
         return collideData;
     }
     checkCollision() {
+        let food = 0;
         let score = 0;
-        let life = 0;
 
+        let next = this.nextPos();
+
+        if (this.checkWall(next)) {
+            score -= 1;
+        }
+
+        //check food collision
+        food += this.isVacant(next.x, next.y);
+
+        return { foodChange: food, scoreChange: score };
+
+    }
+    nextPos() {
         let head = this.worm.wormBody[0];
         let direction = this.worm.direction;
         let next = { ...head };
@@ -335,35 +363,35 @@ class BoardElement {
                 next.y += 1;
                 break;
         }
-
+        return next;
+    }
+    checkWall(pos, change = true) {
         //check wall collision
-        if (next.x > this.cols - 1 || next.x < 0) {
-            if (head.y > this.rows / 2) {
-                this.worm.changeDirection(UP);
+        let bHitWall = false;
+        if (pos.x > this.cols - 1 || pos.x < 0) {
+            bHitWall = true;
+            if (pos.y > this.rows / 2) {
+                if (change) this.changeDirection(UP);
             } else {
-                this.worm.changeDirection(DOWN);
+                if (change) this.changeDirection(DOWN);
             }
-            score = -1;
-        } else if (next.y > this.rows - 1 || next.y < 0) {
-            if (head.x > this.cols / 2) {
-                this.worm.changeDirection(LEFT);
+        } else if (pos.y > this.rows - 1 || pos.y < 0) {
+            bHitWall = true;
+            if (pos.x > this.cols / 2) {
+                if (change) this.changeDirection(LEFT);
             } else {
-                this.worm.changeDirection(RIGHT);
+                if (change) this.changeDirection(RIGHT);
             }
-            score = -1;
         }
-
-        //check food collision
-        let eat = this.isVacant(next.x, next.y);
-        if (eat > 0) {
-            score += eat;
-        } else if (eat < 0) {
-            score += eat;
-            life--;
+        return bHitWall;
+    }
+    changeDirection(direction) {
+        if(direction == this.worm.direction){
+            this.boost = lerp(this.boost, 3, 0.3);
+        } else {
+            this.boost = 1;
         }
-
-        return { scoreChange: score, lifeChange: life };
-
+        this.worm.changeDirection(direction, this.rows, this.cols);
     }
     calculateWindow(parentPos, parentDim) {
 
@@ -401,42 +429,42 @@ class BoardElement {
 
         // if (mouseStart.x > this.pos.xOff && mouseStart.x < this.pos.xOff + this.dim.width && mouseStart.y > this.pos.yOff && mouseStart.y < this.pos.yOff + this.dim.height && mouseEnd.x > this.pos.xOff && mouseEnd.x < this.pos.xOff + this.dim.width && mouseEnd.y > this.pos.yOff && mouseEnd.y < this.pos.yOff + this.dim.height) {
 
-            mouseEnd.sub(mouseStart);//result vector is the direction of the swipe
+        mouseEnd.sub(mouseStart);//result vector is the direction of the swipe
 
-            if (mouseEnd.mag() > 2) {
+        if (mouseEnd.mag() > 2) {
 
-                push();
-                angleMode(RADIANS);//just in case we aren't in radians mode
-                let result = map(mouseEnd.heading(), -PI, PI, 0, 4);//convert to 4 cardinal directions
-                result = round(result, 0);//round to nearest whole number
-                if (bIsMobileFullscreen) {
-                    result += 3;
-                }
-                result %= 4; //4 and 0 are the same direction
-                pop();
-
-                switch (result) {
-                    case 0:
-                        //left
-                        if (game.state == 'play') game.board.worm.changeDirection(LEFT);
-                        break;
-                    case 1:
-                        //up
-                        if (game.state == 'play') game.board.worm.changeDirection(UP);
-                        break;
-                    case 2:
-                        //right
-                        if (game.state == 'play') game.board.worm.changeDirection(RIGHT);
-                        break;
-                    case 3:
-                        //down
-                        if (game.state == 'play') game.board.worm.changeDirection(DOWN);
-                        break;
-                    default:
-                        console.log("some wrong vector from mouse drag or touch swipe");
-                        break;
-                }
+            push();
+            angleMode(RADIANS);//just in case we aren't in radians mode
+            let result = map(mouseEnd.heading(), -PI, PI, 0, 4);//convert to 4 cardinal directions
+            result = round(result, 0);//round to nearest whole number
+            if (bIsMobileFullscreen) {
+                result += 3;
             }
+            result %= 4; //4 and 0 are the same direction
+            pop();
+
+            switch (result) {
+                case 0:
+                    //left
+                    if (game.state == 'play') this.changeDirection(LEFT);
+                    break;
+                case 1:
+                    //up
+                    if (game.state == 'play') this.changeDirection(UP);
+                    break;
+                case 2:
+                    //right
+                    if (game.state == 'play') this.changeDirection(RIGHT);
+                    break;
+                case 3:
+                    //down
+                    if (game.state == 'play') this.changeDirection(DOWN);
+                    break;
+                default:
+                    console.log("some wrong vector from mouse drag or touch swipe");
+                    break;
+            }
+        }
         // }
     }
 }
@@ -449,7 +477,9 @@ class TextElement extends UI {
     draw() {
         super.draw();
         push();
+        textFont(retroFont);
         textAlign(CENTER, CENTER);//align to the center of the box
+        textSize(this.dim.height);
         text(this.text, this.pos.xOff, this.pos.yOff + this.dim.height / 2, this.dim.width);
         pop();
     }
@@ -553,7 +583,7 @@ function makeWelcomeUI(parent) {
     parent.underBoardUIElements.tutorial.addButtonElement("tutorialOk", { ...anchor }, [imageList.tutorialOkIdle, imageList.tutorialOkClick], "OK", () => {
         parent.changeState('ready');
     });
-    
+
     anchor.widthPct = 0.05
     anchor.heightRatio = 1;
     anchor.horz = RIGHT;
@@ -571,16 +601,41 @@ function makePauseUI(parent) {
     anchor.yOffPct = 0.5;
     anchor.horz = CENTER;
     anchor.vert = CENTER;
-    anchor.heightPct = 0.3;
-    anchor.widthRatio = 2.666;
-
+    anchor.widthPct = 0.3;
+    anchor.heightRatio = imageList.pauseWindow.height / imageList.pauseWindow.width;
     parent.addUI("pause", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.pauseWindow);
+
     anchor.vert = BOTTOM;
-    anchor.heightPct = 0.2;
-    anchor.widthRatio = undefined;
+    anchor.widthPct = 0.5;
+    anchor.heightRatio = imageList.resumeIdle.height / imageList.resumeIdle.width;
     anchor.yOffPct = 0.8;
     parent.overBoardUIElements.pause.addButtonElement("unpause", { ...anchor }, [imageList.resumeIdle, imageList.resumeClick], "UNPAUSE", () => {
         parent.togglePause();
+    });
+}
+
+function makeGameOver(parent) {
+    let anchor = defaultAnchor();
+    anchor.xOffPct = 0.5;
+    anchor.yOffPct = 0.5;
+    anchor.horz = CENTER;
+    anchor.vert = CENTER;
+    anchor.widthPct = 0.3;
+    anchor.heightRatio = imageList.gameOverWindow.height / imageList.gameOverWindow.width;
+    parent.addUI("gameOver", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.gameOverWindow);
+
+    anchor.heightPct = 0.2;
+    anchor.widthPct = 0.8;
+    anchor.yOffPct = 0.45;
+    anchor.heightRatio = undefined;
+    parent.overBoardUIElements.gameOver.addTextElement("score", { ...anchor }, undefined, "game.score");
+
+    anchor.vert = BOTTOM;
+    anchor.heightPct = 0.2;
+    anchor.widthRatio = imageList.playAgainClick.width / imageList.playAgainClick.height;
+    anchor.yOffPct = 0.9;
+    parent.overBoardUIElements.gameOver.addButtonElement("playAgain", { ...anchor }, [imageList.playAgainIdle, imageList.playAgainClick], "play again", () => {
+        parent.startGame();
     });
 }
 
@@ -601,11 +656,11 @@ function makeDesktop(parent) {
     btnAnchor.yOffPct = 0.1;
     btnAnchor.heightPct = 0.2;
     btnAnchor.widthRatio = 1;
-    parent.underBoardUIElements.desktop.addButtonElement("bucket", { ...btnAnchor }, [imageList.bucketIdle, imageList.bucketClick], "", () => { 
+    parent.underBoardUIElements.desktop.addButtonElement("bucket", { ...btnAnchor }, [imageList.bucketIdle, imageList.bucketClick], "", () => {
         // console.log("bucket pressed");
-        parent.changeState('tutorial'); 
+        parent.changeState('tutorial');
     });
-    
+
 
     btnAnchor.yOffPct = 0.35;
     parent.underBoardUIElements.desktop.addButtonElement("startGame", { ...btnAnchor }, [imageList.wormGameIdle, imageList.wormGameClick], "", () => {
@@ -618,7 +673,7 @@ function makeDesktop(parent) {
     });
 
     btnAnchor.yOffPct = 0.6;
-    parent.underBoardUIElements.desktop.addButtonElement("apple", { ...btnAnchor }, [imageList.appleIdle, imageList.appleClick], "", () => { 
+    parent.underBoardUIElements.desktop.addButtonElement("apple", { ...btnAnchor }, [imageList.appleIdle, imageList.appleClick], "", () => {
         // console.log("apple pressed"); 
         parent.makeWormFact();
     });
@@ -678,7 +733,7 @@ function makeGameWindow(parent) {
 
 }
 
-function makeWormFact(parent){
+function makeWormFact(parent) {
     let anchor = defaultAnchor();
     anchor.xOffPct = 1;
     anchor.yOffPct = 1;
@@ -686,7 +741,7 @@ function makeWormFact(parent){
     anchor.vert = BOTTOM;
     anchor.widthPct = 0.5;
     anchor.heightRatio = imageList.facts[0].height / imageList.facts[0].width;
-    parent.addUI("fact", fullScreenPos(), fullScreenDim(), {...anchor}, random(imageList.facts));
+    parent.addUI("fact", fullScreenPos(), fullScreenDim(), { ...anchor }, random(imageList.facts));
 
     anchor.xOffPct = 0.977;
     anchor.yOffPct = 0.0285;
@@ -698,4 +753,43 @@ function makeWormFact(parent){
         parent.removeWormFact();
     });
 
+}
+
+function makeTaskBar(parent){
+    let anchor = defaultAnchor();
+    anchor.xOffPct = 0;
+    anchor.yOffPct = 1;
+    anchor.horz = LEFT;
+    anchor.vert = BOTTOM;
+    anchor.heightPct = 0.1;
+    anchor.widthRatio = imageList.livesWindow.width / imageList.livesWindow.height;
+    parent.addUI("lives", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.livesWindow, false);
+
+    anchor.heightPct = 0.9;
+    anchor.widthRatio = imageList.life.width / imageList.life.height;
+    anchor.xOffPct = 1/4;
+    anchor.yOffPct = 0.5;
+    anchor.horz = CENTER;
+    anchor.vert = CENTER;
+    parent.underBoardUIElements.lives.addTextElement("life1", {...anchor}, imageList.life, "");
+    anchor.xOffPct = 2/4;
+    parent.underBoardUIElements.lives.addTextElement("life2", {...anchor}, imageList.life, "");
+    anchor.xOffPct = 3/4;
+    parent.underBoardUIElements.lives.addTextElement("life3", {...anchor}, imageList.life, "");
+
+    anchor.xOffPct = 1;
+    anchor.yOffPct = 1;
+    anchor.horz = RIGHT;
+    anchor.vert = BOTTOM;
+    anchor.heightPct = 0.1;
+    anchor.widthRatio = imageList.scoreWindow.width / imageList.scoreWindow.height;
+    parent.addUI("score", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.scoreWindow, false);
+
+    anchor.xOffPct = 0.5;
+    anchor.yOffPct = 0.45;
+    anchor.heightPct = 0.3;
+    anchor.widthRatio = undefined;
+    anchor.horz = CENTER;
+    anchor.vert = CENTER;
+    parent.underBoardUIElements.score.addTextElement("score", {...anchor}, undefined, "score");
 }

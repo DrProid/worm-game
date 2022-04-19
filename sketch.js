@@ -8,6 +8,8 @@ const CLICK = "click";
 const HOLD = "hold";
 
 let mouseDown;
+// let boostTimer = 0;
+
 let bIsDebugMode = false;
 let version = "v0.191";
 
@@ -28,7 +30,11 @@ function preload() {
   retroFont = loadFont('./assets/images/fonts/Retro Gaming.ttf');
 
   //welcome
-  imageList.tutorial = loadImage('./assets/images/UI_Window_Wormgame_Tutorial.png');
+  if (isMobile) {
+    imageList.tutorial = loadImage('./assets/images/UI_Window_Wormgame_Tutorial_Tablet.png');
+  } else {
+    imageList.tutorial = loadImage('./assets/images/UI_Window_Wormgame_Tutorial.png');
+  }
   imageList.tutorialOkIdle = loadImage('./assets/images/UI_Window_Wormgame_Tutorial_Button_OK_Idle.png');
   imageList.tutorialOkClick = loadImage('./assets/images/UI_Window_Wormgame_Tutorial_Button_OK_Click.png');
   imageList.tutorialXIdle = loadImage('./assets/images/UI_Window_Wormgame_Tutorial_Button_X_Idle.png');
@@ -42,6 +48,12 @@ function preload() {
   imageList.wormGameClick = loadImage('./assets/images/UI_Icon_wormgame_click.png');
   imageList.appleIdle = loadImage('./assets/images/UI_Icon_apple_idle.png');
   imageList.appleClick = loadImage('./assets/images/UI_Icon_apple_click.png');
+
+  //taskbar
+  imageList.livesWindow = loadImage('./assets/images/UI_Window_Lives.png');
+  imageList.life = loadImage('./assets/images/UI_Hearts.gif');
+  imageList.scoreWindow = loadImage('./assets/images/UI_Window_Counter.png');
+
 
   //game window
   imageList.gameWindow = loadImage('./assets/images/UI_Window_Wormgame.png');
@@ -57,9 +69,17 @@ function preload() {
   imageList.resumeIdle = loadImage('./assets/images/UI_Window_Pause_Button_Idle.png');
   imageList.resumeClick = loadImage('./assets/images/UI_Window_Pause_Button_Click.png');
 
+  //game over
+  imageList.gameOverWindow = loadImage('./assets/images/UI_Window_EndScreen.png');
+  imageList.playAgainIdle = loadImage('./assets/images/UI_Window_EndScreen_Button_PlayAgain_Idle.png');
+  imageList.playAgainClick = loadImage('./assets/images/UI_Window_EndScreen_Button_PlayAgain_Click.png');
+
   //worm
-  imageList.wormHeadIdle = loadImage('./assets/images/Char_Head_Idle.png');
-  imageList.wormBody = loadImage('./assets/images/Char_Body.png');
+  imageList.wormHeadIdle = loadImage('./assets/images/worm/Char_Head_Idle.png');
+  imageList.wormHeadOpen = loadImage('./assets/images/worm/Char_Head_Open.png');
+  imageList.wormHeadBad = loadImage('./assets/images/worm/Char_Head_Bad.png');
+  imageList.wormHeadGood = loadImage('./assets/images/worm/Char_Head_Good.png');
+  imageList.wormBody = loadImage('./assets/images/worm/Char_Body.png');
 
   //food
   imageList.good = [];
@@ -103,6 +123,8 @@ function setup() {
 
   game = new StateManager();
   // console.log( imageList.pauseWindow.width, imageList.pauseWindow.height);
+  // console.log(game);
+  // noLoop();
 
 }
 
@@ -115,15 +137,29 @@ function draw() {
   if (mouseIsPressed) {
     checkButtonHold(mouseX, mouseY);
   }
-  push();
-  textFont(retroFont);
-  textSize(height * 0.1);
-  fill('pink');
-  text(game.level, width * 0.1, height * 0.1);
-  text(game.score, width * 0.1, height * 0.2);
-  text(game.life, width * 0.1, height * 0.3);
-  pop();
-  // console.log(game.level);
+
+  // if (game.state == 'play' && (keyIsDown(LEFT_ARROW) || keyIsDown(RIGHT_ARROW) || keyIsDown(UP_ARROW) || keyIsDown(DOWN_ARROW) || keyIsDown(65) || keyIsDown(68) || keyIsDown(87) || keyIsDown(83))) {
+  //   boostTimer += deltaTime;
+  // } else {
+  //   boostTimer = 0;
+  // }
+
+  // if(boostTimer > 1000){
+  //   game.board.boost = 1.5;
+  // } else {
+  //   game.board.boost = 1;
+  // }
+
+
+  // push();
+  // textFont(retroFont);
+  // textSize(height * 0.1);
+  // fill('pink');
+  // text(game.level, width * 0.1, height * 0.1);
+  // text(game.score, width * 0.1, height * 0.2);
+  // text(game.life, width * 0.1, height * 0.3);
+  // pop();
+
   if (bIsDebugMode) {
     push();
     fill('black');
@@ -154,7 +190,7 @@ function windowResized() {
   }
 
   //mobile fullscreen is different
-  if (bIsMobileFullscreen) {
+  if (bIsMobileFullscreen && divHeight > divWidth) {
     resizeCanvas(divHeight, divWidth);
     cnv.elt.style.transform = 'translate(-50%,-50%) rotate(90deg)';
   } else {
@@ -173,19 +209,19 @@ function keyPressed() {
   switch (keyCode) {
     case LEFT_ARROW:
     case 65: //A
-      if (game.state == 'play') game.board.worm.changeDirection(LEFT);
+      if (game.state == 'play') game.board.changeDirection(LEFT);
       break;
     case RIGHT_ARROW:
     case 68: //D
-      if (game.state == 'play') game.board.worm.changeDirection(RIGHT);
+      if (game.state == 'play') game.board.changeDirection(RIGHT);
       break;
     case UP_ARROW:
     case 87: //W
-      if (game.state == 'play') game.board.worm.changeDirection(UP);
+      if (game.state == 'play') game.board.changeDirection(UP);
       break;
     case DOWN_ARROW:
     case 83: //S
-      if (game.state == 'play') game.board.worm.changeDirection(DOWN);
+      if (game.state == 'play') game.board.changeDirection(DOWN);
       break;
     case ENTER:
       if (game.state == 'ready') {

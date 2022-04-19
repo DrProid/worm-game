@@ -9,35 +9,40 @@ Responsibilities:
 class StateManager {
 
   constructor() {
-    // this.changeState('ready');
+
     // let bCanStore = false;
     // if (storageAvailable("localStorage")) {
     //   bCanStore = true;
     //   checkStorage();
     // }
+
     this.underBoardUIElements = {};
     makeDesktop(this);
     makeWelcomeUI(this);
+    makeTaskBar(this);
+    
     makeGameWindow(this);
-    // this.board = new BoardManager(30, 60, this.underBoardUIElements.gameWindow.dim);
+    
     this.overBoardUIElements = {};
     makePauseUI(this);
-
+    makeGameOver(this);
+    
     this.level = 0;
+    this.goodFoodsEaten = 0;
     this.score = 0;
     this.life = 3;
-
-    this.changeState('tutorial');
-
+    
+    this.changeState('ready');
+    
   }
-  makeWormFact(){
+  makeWormFact() {
     makeWormFact(this);
     // console.log(this.overBoardUIElements);
     this.overBoardUIElements.fact.setVisible(true);
     this.overBoardUIElements.fact.setInteractable(true);
   }
-  removeWormFact(){
-    if(this.overBoardUIElements.fact){
+  removeWormFact() {
+    if (this.overBoardUIElements.fact) {
       this.overBoardUIElements.fact.setVisible(false);
       this.overBoardUIElements.fact.setInteractable(false);
     }
@@ -46,7 +51,7 @@ class StateManager {
     this.changeState('play');
     this.board.startGame();
   }
-
+  
   togglePause(forceState) {
     if (forceState != undefined) {
       this.changeState(forceState);// this.state = forceState;
@@ -56,24 +61,24 @@ class StateManager {
       this.changeState('pause');
     }
   }
-
+  
   handleResize() {
-
+    
     let parentPos = { xOff: 0, yOff: 0 };
     let parentDim = { width: width, height: height };
-
+    
     for (let name in this.underBoardUIElements) {
       this.underBoardUIElements[name].calculateWindow(parentPos, parentDim)
     }
-
+    
     this.board.calculateWindow(parentPos, parentDim);
-
+    
     for (let name in this.overBoardUIElements) {
       this.overBoardUIElements[name].calculateWindow(parentPos, parentDim)
     }
-
+    
   }
-
+  
   addUI(name, parentPos, parentDim, anchor, image, bIsOver = true) {
     if (bIsOver) {
       this.overBoardUIElements[name] = new UIContainer(parentPos, parentDim, anchor, image);
@@ -81,11 +86,11 @@ class StateManager {
       this.underBoardUIElements[name] = new UIContainer(parentPos, parentDim, anchor, image);
     }
   }
-
+  
   addGameWindow(parentPos, parentDim, anchor, image, cols, rows) {
     this.board = new BoardElement(parentPos, parentDim, anchor, image, cols, rows);
   }
-
+  
   checkButtons(xPos, yPos, type) {
     let bButtonWasClicked = false;
     for (let name in this.overBoardUIElements) {
@@ -105,7 +110,7 @@ class StateManager {
     }
     return bButtonWasClicked;
   }
-
+  
   changeState(state) {
     switch (state) {
       case 'tutorial':
@@ -115,33 +120,46 @@ class StateManager {
         this.removeWormFact();
         break;
         case 'ready':
-        this.underBoardUIElements.tutorial.setVisible(false);
-        this.underBoardUIElements.tutorial.setInteractable(false);
-        this.overBoardUIElements.pause.setVisible(false);
-        this.overBoardUIElements.pause.setInteractable(false);
-        this.underBoardUIElements.desktop.setInteractable(true);
-        this.board.setInteractable(false);
-        this.board.setVisible(false);
-        this.score = 0;
-        this.life = 3;
-        this.board.foods = [];
-        break;
-      case 'play':
-        this.overBoardUIElements.pause.setVisible(false);
-        this.overBoardUIElements.pause.setInteractable(false);
-        this.underBoardUIElements.desktop.setInteractable(false);
-        this.board.setInteractable(true);
-        this.board.setVisible(true);
-        this.removeWormFact();
-        break;
-        case 'pause':
-          this.overBoardUIElements.pause.setVisible(true);
-          this.overBoardUIElements.pause.setInteractable(true);
-          this.underBoardUIElements.desktop.setInteractable(false);
-          // this.board.setInteractable(false);
-          // this.board.setVisible(true);
-        break;
-      default:
+          this.underBoardUIElements.tutorial.setVisible(false);
+          this.underBoardUIElements.tutorial.setInteractable(false);
+          this.overBoardUIElements.pause.setVisible(false);
+          this.overBoardUIElements.pause.setInteractable(false);
+          this.underBoardUIElements.desktop.setInteractable(true);
+          this.board.setInteractable(false);
+          this.board.setVisible(false);
+          this.underBoardUIElements.lives.setVisible(false);
+          this.underBoardUIElements.score.setVisible(false);
+          break;
+          case 'play':
+            this.overBoardUIElements.gameOver.setVisible(false);
+            this.overBoardUIElements.gameOver.setInteractable(false);
+            this.overBoardUIElements.pause.setVisible(false);
+            this.overBoardUIElements.pause.setInteractable(false);
+            this.underBoardUIElements.desktop.setInteractable(false);
+            this.underBoardUIElements.lives.setVisible(true);
+            this.underBoardUIElements.score.setVisible(true);
+            this.board.setInteractable(true);
+            this.board.setVisible(true);
+            if (this.state != 'pause') {
+              this.goodFoodsEaten = 0;
+              this.level = 0;
+              this.life = 3;
+              this.score = 0;
+              this.board.foods = [];
+            }
+            this.removeWormFact();
+            break;
+            case 'pause':
+              this.overBoardUIElements.pause.setVisible(true);
+              this.overBoardUIElements.pause.setInteractable(true);
+              this.underBoardUIElements.desktop.setInteractable(false);
+              break;
+              case 'gameOver':
+                this.overBoardUIElements.gameOver.elements.score.text = this.score;
+                this.overBoardUIElements.gameOver.setVisible(true);
+                this.overBoardUIElements.gameOver.setInteractable(true);
+                break;
+                default:
         console.error("unknown state sent to changeState : " + state);
     }
     this.state = state;
@@ -173,14 +191,28 @@ class StateManager {
 
   update() {
     let change = this.board.update(this.state);
-    this.life += change.lifeChange;
-    this.score += change.scoreChange;
-    if(change.scoreChange != 0){
-      //change in score, speed/slow up game, increase/decrease max food
-      this.level = floor(this.score / 10);
-      this.board.maxFood = floor(map(this.level, 0, 10, 5, 20, true));
-      this.board.gameTick = map(this.level, 0, 10, 250, 50, true);
-      this.board.goodFoodChance = map(this.level, 0, 10, 1, 0.5, true)
+
+    this.score += change.foodChange * 100 * (this.level + 1);//earn/lose more points for food at higher levels
+
+    this.score += change.scoreChange * 100;//hit a wall deduct 100 points
+    this.underBoardUIElements.score.elements.score.text = this.score;
+    for(let i = 3; i > this.life; i--){
+      this.underBoardUIElements.lives.elements['life'+i].setVisible(false);
+    }
+
+    if (change.foodChange > 0) {
+      this.goodFoodsEaten += change.foodChange;//count the food to track level changes
+      //cspeed/slow up game, increase/decrease max food
+      this.level = floor(this.goodFoodsEaten / 5);
+      this.board.maxFood = floor(map(this.level, 0, 20, 5, 20, true));
+      this.board.gameTick = map(this.level, 0, 15, 300, 50, true);
+      this.board.maxBoost = map(this.level, 0, 15, 3, 1, true);
+      this.board.goodFoodChance = map(this.level, 0, 20, 1, 0.5, true);
+    } else if (change.foodChange < 0) {
+      this.life--;
+      if (this.life <= 0) {
+        this.changeState('gameOver');
+      }
     }
     // console.log(this.score, this.life);
   }

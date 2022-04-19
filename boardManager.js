@@ -89,6 +89,7 @@ class Worm {
         //worm section positions
         this.wormBody = [];
         let startLength = 10;
+        this.headOverride = undefined;
 
         if (this.direction == RIGHT) {
             for (let i = 0; i < startLength; i++) {
@@ -145,8 +146,16 @@ class Worm {
                 fill('#dd9999');
             } else if (i == 1) {
                 bIsHead = true;
-                img = imageList.wormHeadIdle;
+                if(animPercent > 0.5){
+                    img = imageList.wormHeadOpen;
+                } else {
+                    img = imageList.wormHeadIdle;
+                }
+
                 noStroke();
+            }
+            if(this.headOverride && bIsHead){
+                img = this.headOverride;
             }
 
             for (let s = numSubSegments - 1; s >= (bIsHead ? numSubSegments - 1 : 0); s--) {
@@ -241,22 +250,24 @@ class Worm {
         return nextSeg;
     }
 
-    changeDirection(direction) {
+    changeDirection(direction, rows, cols) {
 
-        let lastDirection = this.wormBody[0].direction;
+        let pos = this.wormBody[0];
+        let lastDirection = pos.direction;
 
+        // console.log(pos.x , cols-1, pos.y);
         switch (direction) {
             case LEFT:
-                if (lastDirection != RIGHT) this.direction = direction;
+                if (pos.x > 0 && lastDirection != RIGHT) this.direction = direction;
                 break;
             case RIGHT:
-                if (lastDirection != LEFT) this.direction = direction;
+                if (pos.x < (cols - 1) && lastDirection != LEFT) this.direction = direction;
                 break;
             case UP:
-                if (lastDirection != DOWN) this.direction = direction;
+                if (pos.y > 0 && lastDirection != DOWN) this.direction = direction;
                 break;
             case DOWN:
-                if (lastDirection != UP) this.direction = direction;
+                if (pos.y < (rows - 1) && lastDirection != UP) this.direction = direction;
                 break;
             default:
                 console.error("Worm recieved something that isnt a direction : " + direction);
@@ -270,7 +281,7 @@ class Food {
     //timer
     //good/bad
     constructor(x, y, image, bIsGood) {
-        this.timer = millis() + 20000; // 20 seconds into the future
+        this.timer = 20000; // 20 seconds into the future
         this.bIsGood = bIsGood;
         this.x = x;
         this.y = y;
