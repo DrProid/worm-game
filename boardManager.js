@@ -1,5 +1,5 @@
 /*
-The BoardManager class.
+The BoardElement class.
 Responsibilities:
     -spawns board items (worm/food)
     -draws all board items (worm/food)
@@ -7,77 +7,317 @@ Responsibilities:
     -checks for collision between worm and wall or food
 */
 
+class BoardElement {
+    constructor(parentPos, parentDim, image, cols, rows) {
+        this.pos = {};
+        this.dim = {};
+        this.image = image;
+        this.cols = cols;
+        this.rows = rows;
+        this.calculateWindow(parentPos, parentDim);
+
+        this.visible = true;
+        this.interactable = true;
+
+        this.elements = {};
+
+        this.foods = [];
+        this.maxFood = 5;
+        this.goodFoodChance = 1;
+        this.worm;
+        this.timeKeeper = 0;
+        this.boost = 1;
+        this.maxBoost = 3;
+        this.gameTick = 250;//milliseconds between actual changes to the board (not animations)
+
+    }
+    setVisible(bIsVisible) {
+        this.visible = bIsVisible;
+        for (let name in this.elements) {
+            this.elements[name].setVisible(bIsVisible);
+        }
+    }
+    setInteractable(bIsInteractable) {
+        this.interactable = bIsInteractable;
+        for (let name in this.elements) {
+            this.elements[name].setInteractable(bIsInteractable);
+        }
+    }
+    addButtonElement(name, anchor, image, text, callback) {
+        this.elements[name] = new ButtonElement(this.pos, this.dim, anchor, image, text, callback);
+    }
+    addTextElement(name, anchor, image, text) {
+        this.elements[name] = new TextElement(this.pos, this.dim, anchor, image, text);
+    }
+    spawnWorm(xPos, yPos) {
+        this.worm = new Worm(xPos, yPos);
+    }
+    spawnFood() {
+        let xPos = floor(random(this.cols - 2));
+        let yPos = floor(random(this.rows - 2));
+
+        let bIsVacant = true;
+        //never on top of other food
+        for (let x = 0; x < 3; x++) {
+            for (let y = 0; y < 3; y++) {
+                if (this.isVacant(xPos + x, yPos + y, false) != 0) {
+                    bIsVacant = false;
+                }
+            }
+        }
+
+        //never near the player
+        if (dist(xPos, yPos, this.worm.wormBody[0].x, this.worm.wormBody[0].y) < 7) {
+            bIsVacant = false;
+        }
+
+        if (bIsVacant) {
+            //go ahead and place some food
+            if (random() < this.goodFoodChance) {
+                this.foods.push(new Food(xPos, yPos, random(imageList.good), true));
+            } else {
+                this.foods.push(new Food(xPos, yPos, random(imageList.bad), false));
+            }
+        }
+    }
+    isVacant(x, y, bRemove = true) {
+        for (let i in this.foods) {
+            let score = this.foods[i].isVacant(x, y);
+            if (score != 0) {
+                if (bRemove) {
+                    this.foods.splice(i, 1);
+                }
+                return score;//leave early
+            }
+        }
+        return 0;//no food items hit
+    }
+    startGame() {
+        this.spawnWorm(floor(this.cols / 2) - 1, floor(this.rows / 2) - 1);
+        this.boost = 1;
+        this.maxBoost = 3;
+        this.maxFood = 5;
+        this.goodFoodChance = 1;
+        this.timeKeeper = 0;
+        this.gameTick = 250;
+    }
+    draw() {
+
+        //draw board
+        let imageWidth = this.dim.width * 1.04;
+        let imageHeight = this.dim.height * 1.15;
+        let imageX = (this.dim.width - imageWidth) / 2;
+        let imageY = (this.dim.height - imageHeight) / 2 - this.gridSize;
+
+        //draw window
+        image(this.image, this.pos.xOff + imageX, this.pos.yOff + imageY, imageWidth, imageHeight);
+
+        if (this.visible) {
+            for (let name in this.elements) {
+                this.elements[name].draw();
+            }
+        }
+
+        if (bIsDebugMode) {
+            push();
+            //debug lines
+            for (let i = 0; i <= this.cols; i++) {
+                let xPos = map(i, 0, this.cols, this.pos.xOff, this.dim.width + this.pos.xOff);
+                line(xPos, this.pos.yOff, xPos, this.dim.height + this.pos.yOff);
+            }
+            for (let i = 0; i <= this.rows; i++) {
+                let yPos = map(i, 0, this.rows, this.pos.yOff, this.dim.height + this.pos.yOff);
+                line(this.pos.xOff, yPos, this.dim.width + this.pos.xOff, yPos);
+            }
+            //debug squares
+            fill('red');
+            rect(this.pos.xOff, this.pos.yOff, this.gridSize);
+            fill('yellow');
+            rect(width - this.pos.xOff - this.gridSize, height - this.pos.yOff - this.gridSize, this.gridSize);
+            pop();
+        }
+
+        //draw the worm
+        let animPercent = this.timeKeeper / this.gameTick;
+        this.worm.draw(this.rows, this.cols, this.gridSize, this.pos.xOff, this.pos.yOff, animPercent);
+
+        //draw all foods
+        for (let food of this.foods) {
+            food.draw(this.pos.xOff, this.pos.yOff, this.gridSize, this.cols, this.rows);
+        }
+
+    }
+    update(state) {
+        let collideData = { foodChange: 0, scoreChange: 0 };
+        if (state == 'play') {
+            this.timeKeeper += deltaTime * this.boost;
+
+            //delete stale foods
+            for (let i in this.foods) {
+                this.foods[i].timer -= deltaTime;
+                if (this.foods[i].timer < 0) {
+                    this.foods.splice(i, 1);
+                    i--;
+                }
+            }
+
+            //check for worm movement
+            if (this.timeKeeper >= this.gameTick) {
+                this.timeKeeper -= this.gameTick;
+                this.worm.move(false);
+                this.worm.headOverride = undefined;
+                collideData = this.checkCollision();
+                if(collideData.foodChange > 0){
+                    this.worm.headOverride = imageList.wormHeadGood;
+                } else if(collideData.foodChange < 0){
+                    this.worm.headOverride = imageList.wormHeadBad;
+                }
+            } else {
+                if (this.foods.length < this.maxFood && random() < 0.05) {
+                    this.spawnFood();
+                }
+            }
+        }
+        //return data for score tracking
+        return collideData;
+    }
+    checkCollision() {
+        let food = 0;
+        let score = 0;
+
+        let next = this.nextPos();
+
+        if (this.checkWall(next)) {
+            score -= 1;
+        }
+
+        //check food collision
+        food += this.isVacant(next.x, next.y);
+
+        return { foodChange: food, scoreChange: score };
+
+    }
+    nextPos() {
+        let head = this.worm.wormBody[0];
+        let direction = this.worm.direction;
+        let next = { ...head };
+
+        switch (direction) {
+            case RIGHT:
+                next.x += 1;
+                break;
+            case LEFT:
+                next.x -= 1;
+                break;
+            case UP:
+                next.y -= 1;
+                break;
+            case DOWN:
+                next.y += 1;
+                break;
+        }
+        return next;
+    }
+    checkWall(pos, change = true) {
+        //check wall collision
+        let bHitWall = false;
+        if (pos.x > this.cols - 1 || pos.x < 0) {
+            bHitWall = true;
+            if (pos.y > this.rows / 2) {
+                if (change) this.changeDirection(UP);
+            } else {
+                if (change) this.changeDirection(DOWN);
+            }
+        } else if (pos.y > this.rows - 1 || pos.y < 0) {
+            bHitWall = true;
+            if (pos.x > this.cols / 2) {
+                if (change) this.changeDirection(LEFT);
+            } else {
+                if (change) this.changeDirection(RIGHT);
+            }
+        }
+        return bHitWall;
+    }
+    changeDirection(direction) {
+        if(direction == this.worm.direction){
+            this.boost = lerp(this.boost, this.maxBoost, 0.3);
+        } else {
+            this.boost = 1;
+        }
+        this.worm.changeDirection(direction, this.rows, this.cols);
+    }
+    calculateWindow(parentPos, parentDim) {
+
+        let boardRatio = this.cols / this.rows;
+        let windowRatio = parentDim.width / parentDim.height;
+
+        if (boardRatio < windowRatio) {
+            this.gridSize = parentDim.height / this.rows;
+        } else {
+            this.gridSize = parentDim.width / this.cols;
+        }
+        this.gridSize *= 0.85;
+
+        this.dim.width = this.cols * this.gridSize;
+        this.dim.height = this.rows * this.gridSize;
+
+        this.pos.xOff = (parentDim.width - this.dim.width) / 2;
+        this.pos.yOff = (parentDim.height - this.dim.height) / 2;
 
 
-// class BoardManager {
-//     constructor(rows, cols, parentDim) {
-//         this.cols = cols;
-//         this.rows = rows;
-//         this.calculateBoardWindow(parentDim);
-//         this.worm;
-//         this.timeKeeper = 0;
-//         this.gameTick = 500;//milliseconds between actual changes to the board (not animations)
-//     }
-//     spawnWorm(xPos, yPos) {
-//         this.worm = new Worm(xPos, yPos);
-//     }
-//     spawnFood() {
-//         //never directly in front of player
-//     }
-//     startGame() {
-//         this.spawnWorm(floor(this.cols / 2) - 1, floor(this.rows / 2) - 1);
-//         // this.spawnWorm(0, 0);
-//     }
-//     draw() {
-//         //draw board
-//         let wideBorder = (width - (this.cols * this.gridSize)) / 2;
-//         let highBorder = (height - (this.rows * this.gridSize)) / 2;
+        for (let name in this.elements) {
+            this.elements[name].calculateWindow(this.pos, this.dim);
+        }
+    }
+    checkButtons(xPos, yPos, type) {
+        if (this.visible) {
+            for (let name in this.elements) {
+                if (this.elements[name] instanceof ButtonElement) {
+                    this.elements[name].checkButtons(xPos, yPos, type);
+                }
+            }
+        }
+    }
+    swipeControl(mouseStart, mouseEnd) {
 
-//         if (bIsDebugMode) {
-//             push();
-//             //debug lines
-//             for (let i = 0; i <= this.cols; i++) {
-//                 let xPos = map(i, 0, this.cols, wideBorder, width - wideBorder);
-//                 line(xPos, highBorder, xPos, height - highBorder);
-//             }
-//             for (let i = 0; i <= this.rows; i++) {
-//                 let yPos = map(i, 0, this.rows, highBorder, height - highBorder);
-//                 line(wideBorder, yPos, width - wideBorder, yPos);
-//             }
-//             //debug squares
-//             fill('red');
-//             rect(wideBorder, highBorder, this.gridSize);
-//             fill('yellow');
-//             rect(width - wideBorder - this.gridSize, height - highBorder - this.gridSize, this.gridSize);
-//             pop();
-//         }
+        mouseEnd.sub(mouseStart);//result vector is the direction of the swipe
 
-//         //draw all foods
+        if (mouseEnd.mag() > 2) {
 
-//         //draw the worm
-//         let animPercent = this.timeKeeper / this.gameTick;
-//         this.worm.draw(this.rows, this.cols, this.gridSize, wideBorder, highBorder, animPercent);
+            push();
+            angleMode(RADIANS);//just in case we aren't in radians mode
+            let result = map(mouseEnd.heading(), -PI, PI, 0, 4);//convert to 4 cardinal directions
+            result = round(result, 0);//round to nearest whole number
+            if (bIsMobileFullscreen) {
+                result += 3;
+            }
+            result %= 4; //4 and 0 are the same direction
+            pop();
 
-//     }
-//     update(state) {
-//         if (state == 'play') {
-//             this.timeKeeper += deltaTime;
-//             if (this.timeKeeper >= this.gameTick) {
-//                 this.timeKeeper -= this.gameTick;
-//                 this.worm.move(false);
-//             }
-//         }
-//     }
-//     calculateBoardWindow(parentDim) {
-//         let boardRatio = this.cols / this.rows;
-//         let windowRatio = parentDim.width / parentDim.height;
-//         if (boardRatio < windowRatio) {
-//             this.gridSize = parentDim.height / this.rows;
-//         } else {
-//             this.gridSize = parentDim.width / this.cols;
-//         }
-//     }
-// }
+            switch (result) {
+                case 0:
+                    //left
+                    if (game.state == 'play') this.changeDirection(LEFT);
+                    break;
+                case 1:
+                    //up
+                    if (game.state == 'play') this.changeDirection(UP);
+                    break;
+                case 2:
+                    //right
+                    if (game.state == 'play') this.changeDirection(RIGHT);
+                    break;
+                case 3:
+                    //down
+                    if (game.state == 'play') this.changeDirection(DOWN);
+                    break;
+                default:
+                    console.log("some wrong vector from mouse drag or touch swipe");
+                    break;
+            }
+        }
+    }
+}
 
 class Worm {
 
@@ -134,28 +374,16 @@ class Worm {
             //start from the tail
             let img = imageList.wormBody;
 
-            // fill('salmon');
-            strokeWeight(gridSize / 15);
-            // stroke('tomato');
-            // stroke('black');
-            fill('#e5a7a7');
-            stroke('#b72f2f');
             let bIsHead = false;
-            if (i == 3) {
-                stroke('#dd9999');
-                fill('#dd9999');
-            } else if (i == 1) {
+            if (i == 1) {
                 bIsHead = true;
-                if(animPercent > 0.5){
+                if (this.headOverride) {
+                    img = this.headOverride;
+                } else if (animPercent > 0.5) {
                     img = imageList.wormHeadOpen;
                 } else {
                     img = imageList.wormHeadIdle;
                 }
-
-                noStroke();
-            }
-            if(this.headOverride && bIsHead){
-                img = this.headOverride;
             }
 
             for (let s = numSubSegments - 1; s >= (bIsHead ? numSubSegments - 1 : 0); s--) {
@@ -224,23 +452,15 @@ class Worm {
         let nextSeg;
         switch (this.direction) {
             case LEFT:
-                // this.wormBody.head.x--;
-                // this.wormBody.unshift({ x: headX - 1, y: headY, direction: this.direction });
                 nextSeg = { x: headX - 1, y: headY, direction: this.direction };
                 break;
             case RIGHT:
-                // this.wormBody.head.x++;
-                // this.wormBody.unshift({ x: headX + 1, y: headY, direction: this.direction });
                 nextSeg = { x: headX + 1, y: headY, direction: this.direction };
                 break;
             case UP:
-                // this.wormBody.head.y--;
-                // this.wormBody.unshift({ x: headX, y: headY - 1, direction: this.direction });
                 nextSeg = { x: headX, y: headY - 1, direction: this.direction };
                 break;
             case DOWN:
-                // this.wormBody.head.y++;
-                // this.wormBody.unshift({ x: headX, y: headY + 1, direction: this.direction });
                 nextSeg = { x: headX, y: headY + 1, direction: this.direction };
                 break;
             default:
@@ -255,7 +475,6 @@ class Worm {
         let pos = this.wormBody[0];
         let lastDirection = pos.direction;
 
-        // console.log(pos.x , cols-1, pos.y);
         switch (direction) {
             case LEFT:
                 if (pos.x > 0 && lastDirection != RIGHT) this.direction = direction;
@@ -278,8 +497,6 @@ class Worm {
 }
 
 class Food {
-    //timer
-    //good/bad
     constructor(x, y, image, bIsGood) {
         this.timer = 20000; // 20 seconds into the future
         this.bIsGood = bIsGood;

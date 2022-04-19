@@ -8,13 +8,10 @@ const CLICK = "click";
 const HOLD = "hold";
 
 let mouseDown;
-// let boostTimer = 0;
 
 let bIsDebugMode = false;
 let version = "v0.191";
 
-// let bSuppressPause = false;
-// let suppressPauseInterval;
 let suppressPauseTimer = 0;
 
 var divWidth = document.getElementById('worm-game').offsetWidth;
@@ -122,9 +119,6 @@ function setup() {
   cnv.parent("worm-game");
 
   game = new StateManager();
-  // console.log( imageList.pauseWindow.width, imageList.pauseWindow.height);
-  // console.log(game);
-  // noLoop();
 
 }
 
@@ -137,28 +131,6 @@ function draw() {
   if (mouseIsPressed) {
     checkButtonHold(mouseX, mouseY);
   }
-
-  // if (game.state == 'play' && (keyIsDown(LEFT_ARROW) || keyIsDown(RIGHT_ARROW) || keyIsDown(UP_ARROW) || keyIsDown(DOWN_ARROW) || keyIsDown(65) || keyIsDown(68) || keyIsDown(87) || keyIsDown(83))) {
-  //   boostTimer += deltaTime;
-  // } else {
-  //   boostTimer = 0;
-  // }
-
-  // if(boostTimer > 1000){
-  //   game.board.boost = 1.5;
-  // } else {
-  //   game.board.boost = 1;
-  // }
-
-
-  // push();
-  // textFont(retroFont);
-  // textSize(height * 0.1);
-  // fill('pink');
-  // text(game.level, width * 0.1, height * 0.1);
-  // text(game.score, width * 0.1, height * 0.2);
-  // text(game.life, width * 0.1, height * 0.3);
-  // pop();
 
   if (bIsDebugMode) {
     push();
@@ -225,9 +197,9 @@ function keyPressed() {
       break;
     case ENTER:
       if (game.state == 'ready') {
-        // game.startGame();
+        game.startGame();
       } else if (game.state == 'play' || game.state == 'pause') {
-        // game.togglePause();
+        game.togglePause();
       }
       break;
     default:
