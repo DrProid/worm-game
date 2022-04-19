@@ -24,29 +24,29 @@ let imageList = {};
 
 function preload(){
   //desktop
-  imageList.bg = loadImage('assets/images/UI_Background.png');
-  imageList.bucketIdle = loadImage('assets/images/UI_Icon_Bucket_Idle.png');
-  imageList.bucketClick = loadImage('assets/images/UI_Icon_Bucket_Click.png');
-  imageList.wormGameIdle = loadImage('assets/images/UI_Icon_wormgame_Idle.png');
-  imageList.wormGameClick = loadImage('assets/images/UI_Icon_wormgame_Click.png');
+  imageList.bg = loadImage('./assets/images/UI_Background.png');
+  imageList.bucketIdle = loadImage('./assets/images/UI_Icon_Bucket_Idle.png');
+  imageList.bucketClick = loadImage('./assets/images/UI_Icon_Bucket_Click.png');
+  imageList.wormGameIdle = loadImage('./assets/images/UI_Icon_wormgame_Idle.png');
+  imageList.wormGameClick = loadImage('./assets/images/UI_Icon_wormgame_Click.png');
 
   //game window
-  imageList.gameWindow =  loadImage('assets/images/UI_Window_Wormgame.png');
-  imageList.gameWindowXClick =  loadImage('assets/images/UI_Window_Wormgame_X_Click.png');
-  imageList.gameWindowXIdle =  loadImage('assets/images/UI_Window_Wormgame_X_Idle.png');
-  imageList.gameWindowFullscreenClick =  loadImage('assets/images/UI_Window_Wormgame_Fullscreen_Click.png');
-  imageList.gameWindowFullscreenIdle =  loadImage('assets/images/UI_Window_Wormgame_Fullscreen_Idle.png');
-  imageList.gameWindowPauseClick =  loadImage('assets/images/UI_Window_Wormgame_Pause_Click.png');
-  imageList.gameWindowPauseIdle =  loadImage('assets/images/UI_Window_Wormgame_Pause_Idle.png');
+  imageList.gameWindow =  loadImage('./assets/images/UI_Window_Wormgame.png');
+  imageList.gameWindowXClick =  loadImage('./assets/images/UI_Window_Wormgame_X_Click.png');
+  imageList.gameWindowXIdle =  loadImage('./assets/images/UI_Window_Wormgame_X_Idle.png');
+  imageList.gameWindowFullscreenClick =  loadImage('./assets/images/UI_Window_Wormgame_Fullscreen_Click.png');
+  imageList.gameWindowFullscreenIdle =  loadImage('./assets/images/UI_Window_Wormgame_Fullscreen_Idle.png');
+  imageList.gameWindowPauseClick =  loadImage('./assets/images/UI_Window_Wormgame_Pause_Click.png');
+  imageList.gameWindowPauseIdle =  loadImage('./assets/images/UI_Window_Wormgame_Pause_Idle.png');
   
   //pause
-  imageList.pauseWindow =  loadImage('assets/images/UI_Window_Pause.png');
-  imageList.resumeIdle =  loadImage('assets/images/UI_Window_Pause_Button_Idle.png');
-  imageList.resumeClick =  loadImage('assets/images/UI_Window_Pause_Button_Click.png');
+  imageList.pauseWindow =  loadImage('./assets/images/UI_Window_Pause.png');
+  imageList.resumeIdle =  loadImage('./assets/images/UI_Window_Pause_Button_Idle.png');
+  imageList.resumeClick =  loadImage('./assets/images/UI_Window_Pause_Button_Click.png');
   
   //worm
-  imageList.wormHeadIdle = loadImage('assets/images/Char_Head_Idle.png');
-  imageList.wormBody = loadImage('assets/images/Char_Body.png');
+  imageList.wormHeadIdle = loadImage('./assets/images/Char_Head_Idle.png');
+  imageList.wormBody = loadImage('./assets/images/Char_Body.png');
 }
 
 function setup() {
