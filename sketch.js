@@ -8,31 +8,58 @@ const CLICK = "click";
 const HOLD = "hold";
 
 let mouseDown;
-let bIsDebugMode = true;
-let version = "v0.19";
+let bIsDebugMode = false;
+let version = "v0.191";
 
-let bSuppressPause = false;
+// let bSuppressPause = false;
+// let suppressPauseInterval;
+let suppressPauseTimer = 0;
 
 var divWidth = document.getElementById('worm-game').offsetWidth;
 var divHeight = document.getElementById('worm-game').offsetHeight;
 
 let cnv;//canvas context
 
+let imageList = {};
+
+function preload(){
+  //desktop
+  imageList.bg = loadImage('assets/images/UI_Background.png');
+  imageList.bucketIdle = loadImage('assets/images/UI_Icon_Bucket_Idle.png');
+  imageList.bucketClick = loadImage('assets/images/UI_Icon_Bucket_Click.png');
+  imageList.wormGameIdle = loadImage('assets/images/UI_Icon_wormgame_Idle.png');
+  imageList.wormGameClick = loadImage('assets/images/UI_Icon_wormgame_Click.png');
+
+  //game window
+  imageList.gameWindow =  loadImage('assets/images/UI_Window_Wormgame.png');
+  imageList.gameWindowXClick =  loadImage('assets/images/UI_Window_Wormgame_X_Click.png');
+  imageList.gameWindowXIdle =  loadImage('assets/images/UI_Window_Wormgame_X_Idle.png');
+  imageList.gameWindowFullscreenClick =  loadImage('assets/images/UI_Window_Wormgame_Fullscreen_Click.png');
+  imageList.gameWindowFullscreenIdle =  loadImage('assets/images/UI_Window_Wormgame_Fullscreen_Idle.png');
+  imageList.gameWindowPauseClick =  loadImage('assets/images/UI_Window_Wormgame_Pause_Click.png');
+  imageList.gameWindowPauseIdle =  loadImage('assets/images/UI_Window_Wormgame_Pause_Idle.png');
+  
+  //pause
+  imageList.pauseWindow =  loadImage('assets/images/UI_Window_Pause.png');
+  imageList.resumeIdle =  loadImage('assets/images/UI_Window_Pause_Button_Idle.png');
+  imageList.resumeClick =  loadImage('assets/images/UI_Window_Pause_Button_Click.png');
+  
+  //worm
+  imageList.wormHeadIdle = loadImage('assets/images/Char_Head_Idle.png');
+  imageList.wormBody = loadImage('assets/images/Char_Body.png');
+}
+
 function setup() {
+  
   cnv = createCanvas(divWidth, divHeight);
   cnv.elt.style.left = "50%";
   cnv.elt.style.top = "50%";
   cnv.elt.style.transform = 'translate(-50%,-50%)';
-
+  
   cnv.parent("worm-game");
+  
   game = new StateManager();
-
-  makeDesktop();
-
-  makeWelcomeUI();
-  makePauseUI();
-
-  game.changeState('ready');
+  // console.log( imageList.pauseWindow.width, imageList.pauseWindow.height);
 
 }
 
@@ -42,6 +69,9 @@ function draw() {
   game.update();
   game.draw();
 
+  if(mouseIsPressed){
+    checkButtonHold(mouseX, mouseY);
+  }
 
   if (bIsDebugMode) {
     push();
@@ -60,15 +90,19 @@ function draw() {
 }
 
 function windowResized() {
+  //get the div dimensions
   divWidth = document.getElementById('worm-game').offsetWidth;
   divHeight = document.getElementById('worm-game').offsetHeight;
+
+  //if this resize is because player pressed 'fullscreen', don't pause the game
   if (game.state == 'play') {
-    if (bSuppressPause) {
-      bSuppressPause = false;
+    if (suppressPauseTimer - millis() > 0) {
     } else {
       game.togglePause('pause');
     }
   }
+
+  //mobile fullscreen is different
   if (bIsMobileFullscreen) {
     resizeCanvas(divHeight, divWidth);
     cnv.elt.style.transform = 'translate(-50%,-50%) rotate(90deg)';
@@ -76,9 +110,11 @@ function windowResized() {
     resizeCanvas(divWidth, divHeight);
     cnv.elt.style.transform = 'translate(-50%,-50%)';
   }
+
   game.handleResize(width, height);
 
 }
+
 
 /******************************* CONTROLS INPUT ***********************************/
 
@@ -113,19 +149,6 @@ function keyPressed() {
   }
 }
 
-// function mouseClicked() {
-//   switch (game.state) {
-//     case 'ready':
-//       game.startGame();
-//       break;
-//     case 'pause':
-//       game.togglePause();
-//       break;
-//     default:
-//       break;
-//   }
-// }
-
 function touchStarted() {
   swipeControlStart();
 }
@@ -144,6 +167,15 @@ function mouseReleased() {
 
 function swipeControlStart() {
   mouseDown = createVector(mouseX, mouseY);//store the position of the mouse when it is pressed
+  checkButtonHold(mouseX, mouseY)
+}
+
+function checkButtonHold(xPos, yPos){
+  if (bIsMobileFullscreen) {
+    game.checkButtons(yPos, height - xPos, HOLD);
+  } else {
+    game.checkButtons(xPos, yPos, HOLD);
+  }
 }
 
 function swipeControlEnd() {
@@ -158,42 +190,8 @@ function swipeControlEnd() {
   if (!bButtonWasClicked && game.state == 'play' && mouseDown != undefined) {
     //game swipe controls
     let mouseVec = createVector(mouseX, mouseY);//get current mouse or touch location
-    mouseVec.sub(mouseDown);//result vector is the direction of the swipe
+    game.board.swipeControl(mouseDown, mouseVec);
     mouseDown = undefined;//clear mouseDown because I don't want strange edge cases where mouseReleased is called twice (trust issues)
-    if (mouseVec.mag() > 2) {
-
-      push();
-      angleMode(RADIANS);//just in case we aren't in radians mode
-      let result = map(mouseVec.heading(), -PI, PI, 0, 4);//convert to 4 cardinal directions
-      result = round(result, 0);//round to nearest whole number
-      if (bIsMobileFullscreen) {
-        result += 3;
-      }
-      result %= 4; //4 and 0 are the same direction
-      pop();
-
-      switch (result) {
-        case 0:
-          //left
-          if (game.state == 'play') game.board.worm.changeDirection(LEFT);
-          break;
-        case 1:
-          //up
-          if (game.state == 'play') game.board.worm.changeDirection(UP);
-          break;
-        case 2:
-          //right
-          if (game.state == 'play') game.board.worm.changeDirection(RIGHT);
-          break;
-        case 3:
-          //down
-          if (game.state == 'play') game.board.worm.changeDirection(DOWN);
-          break;
-        default:
-          console.log("some wrong vector from mouse drag or touch swipe");
-          break;
-      }
-    }
   }
 
 }

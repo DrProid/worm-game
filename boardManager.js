@@ -9,75 +9,75 @@ Responsibilities:
 
 
 
-class BoardManager {
-    constructor(rows, cols) {
-        this.cols = cols;
-        this.rows = rows;
-        this.calculateBoardWindow(width, height);
-        this.worm;
-        this.timeKeeper = 0;
-        this.gameTick = 500;//milliseconds between actual changes to the board (not animations)
-    }
-    spawnWorm(xPos, yPos) {
-        this.worm = new Worm(xPos, yPos);
-    }
-    spawnFood() {
-        //never directly in front of player
-    }
-    startGame() {
-        this.spawnWorm(floor(this.cols / 2) - 1, floor(this.rows / 2) - 1);
-        // this.spawnWorm(0, 0);
-    }
-    draw() {
-        //draw board
-        let wideBorder = (width - (this.cols * this.gridSize)) / 2;
-        let highBorder = (height - (this.rows * this.gridSize)) / 2;
+// class BoardManager {
+//     constructor(rows, cols, parentDim) {
+//         this.cols = cols;
+//         this.rows = rows;
+//         this.calculateBoardWindow(parentDim);
+//         this.worm;
+//         this.timeKeeper = 0;
+//         this.gameTick = 500;//milliseconds between actual changes to the board (not animations)
+//     }
+//     spawnWorm(xPos, yPos) {
+//         this.worm = new Worm(xPos, yPos);
+//     }
+//     spawnFood() {
+//         //never directly in front of player
+//     }
+//     startGame() {
+//         this.spawnWorm(floor(this.cols / 2) - 1, floor(this.rows / 2) - 1);
+//         // this.spawnWorm(0, 0);
+//     }
+//     draw() {
+//         //draw board
+//         let wideBorder = (width - (this.cols * this.gridSize)) / 2;
+//         let highBorder = (height - (this.rows * this.gridSize)) / 2;
 
-        if (bIsDebugMode) {
-            push();
-            //debug lines
-            for (let i = 0; i <= this.cols; i++) {
-                let xPos = map(i, 0, this.cols, wideBorder, width - wideBorder);
-                line(xPos, highBorder, xPos, height - highBorder);
-            }
-            for (let i = 0; i <= this.rows; i++) {
-                let yPos = map(i, 0, this.rows, highBorder, height - highBorder);
-                line(wideBorder, yPos, width - wideBorder, yPos);
-            }
-            //debug squares
-            fill('red');
-            rect(wideBorder, highBorder, this.gridSize);
-            fill('yellow');
-            rect(width - wideBorder - this.gridSize, height - highBorder - this.gridSize, this.gridSize);
-            pop();
-        }
+//         if (bIsDebugMode) {
+//             push();
+//             //debug lines
+//             for (let i = 0; i <= this.cols; i++) {
+//                 let xPos = map(i, 0, this.cols, wideBorder, width - wideBorder);
+//                 line(xPos, highBorder, xPos, height - highBorder);
+//             }
+//             for (let i = 0; i <= this.rows; i++) {
+//                 let yPos = map(i, 0, this.rows, highBorder, height - highBorder);
+//                 line(wideBorder, yPos, width - wideBorder, yPos);
+//             }
+//             //debug squares
+//             fill('red');
+//             rect(wideBorder, highBorder, this.gridSize);
+//             fill('yellow');
+//             rect(width - wideBorder - this.gridSize, height - highBorder - this.gridSize, this.gridSize);
+//             pop();
+//         }
 
-        //draw all foods
+//         //draw all foods
 
-        //draw the worm
-        let animPercent = this.timeKeeper / this.gameTick;
-        this.worm.draw(this.rows, this.cols, this.gridSize, wideBorder, highBorder, animPercent);
+//         //draw the worm
+//         let animPercent = this.timeKeeper / this.gameTick;
+//         this.worm.draw(this.rows, this.cols, this.gridSize, wideBorder, highBorder, animPercent);
 
-    }
-    update(state) {
-        if (state == 'play') {
-            this.timeKeeper += deltaTime;
-            if (this.timeKeeper >= this.gameTick) {
-                this.timeKeeper -= this.gameTick;
-                this.worm.move(false);
-            }
-        }
-    }
-    calculateBoardWindow(wide, tall) {
-        let boardRatio = this.cols / this.rows;
-        let windowRatio = wide / tall;
-        if (boardRatio < windowRatio) {
-            this.gridSize = tall / this.rows;
-        } else {
-            this.gridSize = wide / this.cols;
-        }
-    }
-}
+//     }
+//     update(state) {
+//         if (state == 'play') {
+//             this.timeKeeper += deltaTime;
+//             if (this.timeKeeper >= this.gameTick) {
+//                 this.timeKeeper -= this.gameTick;
+//                 this.worm.move(false);
+//             }
+//         }
+//     }
+//     calculateBoardWindow(parentDim) {
+//         let boardRatio = this.cols / this.rows;
+//         let windowRatio = parentDim.width / parentDim.height;
+//         if (boardRatio < windowRatio) {
+//             this.gridSize = parentDim.height / this.rows;
+//         } else {
+//             this.gridSize = parentDim.width / this.cols;
+//         }
+//     }
+// }
 
 class Worm {
 
@@ -105,9 +105,8 @@ class Worm {
     //draws the worm
     draw(rows, cols, gridSize, xBorder, yBorder, animPercent) {
         push();
-
         let numSegments = this.wormBody.length;
-        let numSubSegments = 5;
+        let numSubSegments = 2;
         let totalSubSegments = numSubSegments * numSegments;
 
         let maxPctOffsetOnSpline = 1 / numSegments;
@@ -132,6 +131,7 @@ class Worm {
         //draw body segments
         for (let i = numSegments; i > 0; i--) {
             //start from the tail
+            let img = imageList.wormBody;
 
             // fill('salmon');
             strokeWeight(gridSize / 15);
@@ -145,6 +145,7 @@ class Worm {
                 fill('#dd9999');
             } else if (i == 1) {
                 bIsHead = true;
+                img = imageList.wormHeadIdle;
                 noStroke();
             }
 
@@ -161,7 +162,21 @@ class Worm {
                 subSegPct -= lerp(0, maxPctOffsetOnSpline, alpha);
 
                 let pos = curve.getPointAt(subSegPct);
-                ellipse(pos.x, pos.y, gridSize);
+                // ellipse(pos.x, pos.y, gridSize);
+                imageMode(CENTER);
+                push();
+                translate(pos.x, pos.y);
+                if (bIsHead && s == numSubSegments - 1) {
+                    if (this.direction == RIGHT) {
+                        scale(-1, 1);
+                    } else if (this.direction == UP) {
+                        rotate(HALF_PI);
+                    } else if (this.direction == DOWN) {
+                        rotate(-HALF_PI);
+                    }
+                }
+                image(img, 0, 0, gridSize * 1.75, gridSize * 1.75);
+                pop();
             }
 
 
