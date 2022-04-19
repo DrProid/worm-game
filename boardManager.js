@@ -269,6 +269,24 @@ class Worm {
 class Food {
     //timer
     //good/bad
-
+    constructor(x, y, image, bIsGood) {
+        this.timer = millis() + 20000; // 20 seconds into the future
+        this.bIsGood = bIsGood;
+        this.x = x;
+        this.y = y;
+        this.image = image;
+    }
+    draw(xOff, yOff, gridSize, cols, rows) {
+        let xPos = map(this.x, 0, cols, xOff, gridSize * cols + xOff);
+        let yPos = map(this.y, 0, rows, yOff, gridSize * rows + yOff);
+        image(this.image, xPos, yPos, gridSize * 3, gridSize * 3);
+    }
+    isVacant(x, y) {
+        if (x >= this.x && x <= this.x + 2 && y >= this.y && y <= this.y + 2) {
+            return (this.bIsGood ? 1 : -1);
+        } else {
+            return 0;
+        }
+    }
 }
 

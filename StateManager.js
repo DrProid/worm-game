@@ -17,17 +17,31 @@ class StateManager {
     // }
     this.underBoardUIElements = {};
     makeDesktop(this);
+    makeWelcomeUI(this);
     makeGameWindow(this);
     // this.board = new BoardManager(30, 60, this.underBoardUIElements.gameWindow.dim);
     this.overBoardUIElements = {};
-    // makeWelcomeUI(this);
     makePauseUI(this);
 
+    this.level = 0;
+    this.score = 0;
+    this.life = 3;
 
-    this.changeState('ready');
+    this.changeState('tutorial');
 
   }
-
+  makeWormFact(){
+    makeWormFact(this);
+    // console.log(this.overBoardUIElements);
+    this.overBoardUIElements.fact.setVisible(true);
+    this.overBoardUIElements.fact.setInteractable(true);
+  }
+  removeWormFact(){
+    if(this.overBoardUIElements.fact){
+      this.overBoardUIElements.fact.setVisible(false);
+      this.overBoardUIElements.fact.setInteractable(false);
+    }
+  }
   startGame() {
     this.changeState('play');
     this.board.startGame();
@@ -94,10 +108,23 @@ class StateManager {
 
   changeState(state) {
     switch (state) {
-      case 'ready':
+      case 'tutorial':
+        this.underBoardUIElements.tutorial.setVisible(true);
+        this.underBoardUIElements.tutorial.setInteractable(true);
+        this.underBoardUIElements.desktop.setInteractable(false);
+        this.removeWormFact();
+        break;
+        case 'ready':
+        this.underBoardUIElements.tutorial.setVisible(false);
+        this.underBoardUIElements.tutorial.setInteractable(false);
+        this.overBoardUIElements.pause.setVisible(false);
+        this.overBoardUIElements.pause.setInteractable(false);
         this.underBoardUIElements.desktop.setInteractable(true);
         this.board.setInteractable(false);
         this.board.setVisible(false);
+        this.score = 0;
+        this.life = 3;
+        this.board.foods = [];
         break;
       case 'play':
         this.overBoardUIElements.pause.setVisible(false);
@@ -105,6 +132,7 @@ class StateManager {
         this.underBoardUIElements.desktop.setInteractable(false);
         this.board.setInteractable(true);
         this.board.setVisible(true);
+        this.removeWormFact();
         break;
         case 'pause':
           this.overBoardUIElements.pause.setVisible(true);
@@ -144,7 +172,17 @@ class StateManager {
   }
 
   update() {
-    this.board.update(this.state);
+    let change = this.board.update(this.state);
+    this.life += change.lifeChange;
+    this.score += change.scoreChange;
+    if(change.scoreChange != 0){
+      //change in score, speed/slow up game, increase/decrease max food
+      this.level = floor(this.score / 10);
+      this.board.maxFood = floor(map(this.level, 0, 10, 5, 20, true));
+      this.board.gameTick = map(this.level, 0, 10, 250, 50, true);
+      this.board.goodFoodChance = map(this.level, 0, 10, 1, 0.5, true)
+    }
+    // console.log(this.score, this.life);
   }
 
 }

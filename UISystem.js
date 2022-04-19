@@ -133,7 +133,7 @@ class UIContainer extends UI {
         if (this.visible) {
             for (let name in this.elements) {
                 if (this.elements[name] instanceof ButtonElement) {
-                    if(this.elements[name].checkButtons(xPos, yPos, type)){
+                    if (this.elements[name].checkButtons(xPos, yPos, type)) {
                         result = true;
                     }
                 }
@@ -157,9 +157,13 @@ class BoardElement {
 
         this.elements = {};
 
+        this.foods = [];
+        this.maxFood = 5;
+        this.goodFoodChance = 1;
         this.worm;
         this.timeKeeper = 0;
-        this.gameTick = 500;//milliseconds between actual changes to the board (not animations)
+        this.gameTick = 250;//milliseconds between actual changes to the board (not animations)
+
     }
     setVisible(bIsVisible) {
         this.visible = bIsVisible;
@@ -176,15 +180,58 @@ class BoardElement {
     addButtonElement(name, anchor, image, text, callback) {
         this.elements[name] = new ButtonElement(this.pos, this.dim, anchor, image, text, callback);
     }
+    addTextElement(name, anchor, image, text) {
+        this.elements[name] = new TextElement(this.pos, this.dim, anchor, image, text);
+    }
     spawnWorm(xPos, yPos) {
         this.worm = new Worm(xPos, yPos);
     }
-    // spawnFood() {
-    //     //never directly in front of player
-    // }
+    spawnFood() {
+        let xPos = floor(random(this.cols - 2));
+        let yPos = floor(random(this.rows - 2));
+
+        // let xPos = 0;
+        // let yPos = 0;
+
+        let bIsVacant = true;
+        //never on top of other food
+        for (let x = 0; x < 3; x++) {
+            for (let y = 0; y < 3; y++) {
+                if (this.isVacant(xPos + x, yPos + y, false) != 0) {
+                    bIsVacant = false;
+                }
+            }
+        }
+
+        //never near the player
+        if(dist(xPos, yPos, this.worm.wormBody[0].x, this.worm.wormBody[0].y) < 7){
+            bIsVacant = false;
+        }
+
+        if (bIsVacant) {
+            //go ahead and place some food
+            if (random() < this.goodFoodChance) {
+                this.foods.push(new Food(xPos, yPos, random(imageList.good), true));
+            } else {
+                this.foods.push(new Food(xPos, yPos, random(imageList.bad), false));
+            }
+        }
+    }
+    isVacant(x, y, bRemove = true) {
+        for (let i in this.foods) {
+            let score = this.foods[i].isVacant(x, y);
+            if (score != 0) {
+                if (bRemove) {
+                    this.foods.splice(i, 1);
+                }
+                return score;//leave early
+            }
+        }
+        return 0;//no food items hit
+    }
     startGame() {
         this.spawnWorm(floor(this.cols / 2) - 1, floor(this.rows / 2) - 1);
-        // this.spawnWorm(0, 0);
+        // this.spawnWorm(50, 20);
     }
     draw() {
 
@@ -230,21 +277,93 @@ class BoardElement {
             pop();
         }
 
-        //draw all foods
-
         //draw the worm
         let animPercent = this.timeKeeper / this.gameTick;
         this.worm.draw(this.rows, this.cols, this.gridSize, this.pos.xOff, this.pos.yOff, animPercent);
 
+        //draw all foods
+        for (let food of this.foods) {
+            food.draw(this.pos.xOff, this.pos.yOff, this.gridSize, this.cols, this.rows);
+        }
+
     }
     update(state) {
+        let collideData = { scoreChange: 0, lifeChange: 0 };;
         if (state == 'play') {
             this.timeKeeper += deltaTime;
+
+            //delete stale foods
+            for (let i in this.foods) {
+                if (this.foods[i].timer <= millis()) {
+                    this.foods.splice(i, 1);
+                }
+            }
+
+            //check for worm movement
             if (this.timeKeeper >= this.gameTick) {
                 this.timeKeeper -= this.gameTick;
+                collideData = this.checkCollision();
                 this.worm.move(false);
+            } else {
+                if (this.foods.length < this.maxFood && random() < 0.05) {
+                    this.spawnFood();
+                }
             }
         }
+        //return data for score tracking
+        return collideData;
+    }
+    checkCollision() {
+        let score = 0;
+        let life = 0;
+
+        let head = this.worm.wormBody[0];
+        let direction = this.worm.direction;
+        let next = { ...head };
+
+        switch (direction) {
+            case RIGHT:
+                next.x += 1;
+                break;
+            case LEFT:
+                next.x -= 1;
+                break;
+            case UP:
+                next.y -= 1;
+                break;
+            case DOWN:
+                next.y += 1;
+                break;
+        }
+
+        //check wall collision
+        if (next.x > this.cols - 1 || next.x < 0) {
+            if (head.y > this.rows / 2) {
+                this.worm.changeDirection(UP);
+            } else {
+                this.worm.changeDirection(DOWN);
+            }
+            score = -1;
+        } else if (next.y > this.rows - 1 || next.y < 0) {
+            if (head.x > this.cols / 2) {
+                this.worm.changeDirection(LEFT);
+            } else {
+                this.worm.changeDirection(RIGHT);
+            }
+            score = -1;
+        }
+
+        //check food collision
+        let eat = this.isVacant(next.x, next.y);
+        if (eat > 0) {
+            score += eat;
+        } else if (eat < 0) {
+            score += eat;
+            life--;
+        }
+
+        return { scoreChange: score, lifeChange: life };
+
     }
     calculateWindow(parentPos, parentDim) {
 
@@ -280,7 +399,7 @@ class BoardElement {
     }
     swipeControl(mouseStart, mouseEnd) {
 
-        if (mouseStart.x > this.pos.xOff && mouseStart.x < this.pos.xOff + this.dim.width && mouseStart.y > this.pos.yOff && mouseStart.y < this.pos.yOff + this.dim.height && mouseEnd.x > this.pos.xOff && mouseEnd.x < this.pos.xOff + this.dim.width && mouseEnd.y > this.pos.yOff && mouseEnd.y < this.pos.yOff + this.dim.height) {
+        // if (mouseStart.x > this.pos.xOff && mouseStart.x < this.pos.xOff + this.dim.width && mouseStart.y > this.pos.yOff && mouseStart.y < this.pos.yOff + this.dim.height && mouseEnd.x > this.pos.xOff && mouseEnd.x < this.pos.xOff + this.dim.width && mouseEnd.y > this.pos.yOff && mouseEnd.y < this.pos.yOff + this.dim.height) {
 
             mouseEnd.sub(mouseStart);//result vector is the direction of the swipe
 
@@ -318,7 +437,7 @@ class BoardElement {
                         break;
                 }
             }
-        }
+        // }
     }
 }
 
@@ -371,7 +490,7 @@ class ButtonElement extends TextElement {
         if (this.isOverElement(xPos, yPos)) {
             this.state = 0;
             let active = this.interactable;//interactable may change because of callback so store it
-            if (this.interactable){
+            if (this.interactable) {
                 this.callback();
             }
             return active;
@@ -418,19 +537,33 @@ function fullScreenDim() {
     return { width: width, height: height };
 }
 
-// function makeWelcomeUI(parent) {
-//     let anchor = defaultAnchor();
-//     anchor.xOffPct = 0.5;
-//     anchor.yOffPct = 0.5;
-//     anchor.horz = CENTER;
-//     anchor.vert = CENTER;
-//     parent.addUI("welcome", fullScreenPos(), fullScreenDim(), anchor, imageList.bg);
-//     let btnAnchor = { ...anchor }; //shallow copy the anchor
-//     btnAnchor.heightRatio = 1 / 3;
-//     parent.overBoardUIElements.welcome.addButtonElement("start", btnAnchor, [imageList.bg], "START", () => {
-//         parent.startGame();
-//     });
-// }
+function makeWelcomeUI(parent) {
+    let anchor = defaultAnchor();
+    anchor.xOffPct = 0.5;
+    anchor.yOffPct = 0.5;
+    anchor.horz = CENTER;
+    anchor.vert = CENTER;
+    anchor.widthPct = 0.9;
+    anchor.heightRatio = imageList.tutorial.height / imageList.tutorial.width;
+    parent.addUI("tutorial", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.tutorial, false);
+
+    anchor.widthPct = 0.1;
+    anchor.heightRatio = imageList.tutorialOkClick.height / imageList.tutorialOkClick.width;
+    anchor.yOffPct = 0.9;
+    parent.underBoardUIElements.tutorial.addButtonElement("tutorialOk", { ...anchor }, [imageList.tutorialOkIdle, imageList.tutorialOkClick], "OK", () => {
+        parent.changeState('ready');
+    });
+    
+    anchor.widthPct = 0.05
+    anchor.heightRatio = 1;
+    anchor.horz = RIGHT;
+    anchor.vert = TOP;
+    anchor.xOffPct = 0.991;
+    anchor.yOffPct = 0.015;
+    parent.underBoardUIElements.tutorial.addButtonElement("tutorialX", { ...anchor }, [imageList.tutorialXIdle, imageList.tutorialXClick], "X", () => {
+        parent.changeState('ready');
+    });
+}
 
 function makePauseUI(parent) {
     let anchor = defaultAnchor();
@@ -440,13 +573,13 @@ function makePauseUI(parent) {
     anchor.vert = CENTER;
     anchor.heightPct = 0.3;
     anchor.widthRatio = 2.666;
-    
-    parent.addUI("pause", fullScreenPos(), fullScreenDim(), {...anchor}, imageList.pauseWindow);
+
+    parent.addUI("pause", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.pauseWindow);
     anchor.vert = BOTTOM;
     anchor.heightPct = 0.2;
     anchor.widthRatio = undefined;
     anchor.yOffPct = 0.8;
-    parent.overBoardUIElements.pause.addButtonElement("unpause", {...anchor}, [imageList.resumeIdle, imageList.resumeClick], "UNPAUSE", () => {
+    parent.overBoardUIElements.pause.addButtonElement("unpause", { ...anchor }, [imageList.resumeIdle, imageList.resumeClick], "UNPAUSE", () => {
         parent.togglePause();
     });
 }
@@ -466,21 +599,28 @@ function makeDesktop(parent) {
     let btnAnchor = { ...anchor }; //shallow copy the anchor
     btnAnchor.xOffPct = 0.1;
     btnAnchor.yOffPct = 0.1;
-    btnAnchor.heightPct = 0.1;
+    btnAnchor.heightPct = 0.2;
     btnAnchor.widthRatio = 1;
-    parent.underBoardUIElements.desktop.addButtonElement("bucket", { ...btnAnchor }, [imageList.bucketIdle, imageList.bucketClick], "", () => { console.log("bucket pressed"); });
+    parent.underBoardUIElements.desktop.addButtonElement("bucket", { ...btnAnchor }, [imageList.bucketIdle, imageList.bucketClick], "", () => { 
+        // console.log("bucket pressed");
+        parent.changeState('tutorial'); 
+    });
+    
 
-    btnAnchor.xOffPct = 0.1;
-    btnAnchor.yOffPct = 0.25;
-    btnAnchor.heightPct = 0.1;
-    btnAnchor.widthRatio = 1;
+    btnAnchor.yOffPct = 0.35;
     parent.underBoardUIElements.desktop.addButtonElement("startGame", { ...btnAnchor }, [imageList.wormGameIdle, imageList.wormGameClick], "", () => {
         // console.log("start pressed");
-        if(isMobile){
+        if (isMobile) {
             bIsMobileFullscreen = true;
             fullscreen(true);
         }
         parent.startGame();
+    });
+
+    btnAnchor.yOffPct = 0.6;
+    parent.underBoardUIElements.desktop.addButtonElement("apple", { ...btnAnchor }, [imageList.appleIdle, imageList.appleClick], "", () => { 
+        // console.log("apple pressed"); 
+        parent.makeWormFact();
     });
 
     // if (isMobile) {
@@ -511,8 +651,9 @@ function makeGameWindow(parent) {
     btnAnchor.vert = BOTTOM;
     btnAnchor.widthPct = 0.04;
     btnAnchor.heightRatio = 1;
+
     parent.board.addButtonElement("close", { ...btnAnchor }, [imageList.gameWindowXIdle, imageList.gameWindowXClick], "", () => {
-        console.log("close clicked");
+        parent.changeState('ready');
     });
 
     btnAnchor.xOffPct = 0.95;
@@ -533,6 +674,28 @@ function makeGameWindow(parent) {
     parent.board.addButtonElement("pause", { ...btnAnchor }, [imageList.gameWindowPauseIdle, imageList.gameWindowPauseClick], "", () => {
         // console.log("pause clicked");
         parent.togglePause();
+    });
+
+}
+
+function makeWormFact(parent){
+    let anchor = defaultAnchor();
+    anchor.xOffPct = 1;
+    anchor.yOffPct = 1;
+    anchor.horz = RIGHT;
+    anchor.vert = BOTTOM;
+    anchor.widthPct = 0.5;
+    anchor.heightRatio = imageList.facts[0].height / imageList.facts[0].width;
+    parent.addUI("fact", fullScreenPos(), fullScreenDim(), {...anchor}, random(imageList.facts));
+
+    anchor.xOffPct = 0.977;
+    anchor.yOffPct = 0.0285;
+    anchor.vert = TOP;
+    anchor.widthPct = 0.05;
+    anchor.heightRatio = 1;
+    parent.overBoardUIElements.fact.addButtonElement("factX", { ...anchor }, [imageList.factXIdle, imageList.factXClick], "X", () => {
+        // console.log("close fact");
+        parent.removeWormFact();
     });
 
 }

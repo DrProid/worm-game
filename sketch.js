@@ -21,43 +21,86 @@ var divHeight = document.getElementById('worm-game').offsetHeight;
 let cnv;//canvas context
 
 let imageList = {};
+let retroFont;
 
-function preload(){
+function preload() {
+  //font
+  retroFont = loadFont('./assets/images/fonts/Retro Gaming.ttf');
+
+  //welcome
+  imageList.tutorial = loadImage('./assets/images/UI_Window_Wormgame_Tutorial.png');
+  imageList.tutorialOkIdle = loadImage('./assets/images/UI_Window_Wormgame_Tutorial_Button_OK_Idle.png');
+  imageList.tutorialOkClick = loadImage('./assets/images/UI_Window_Wormgame_Tutorial_Button_OK_Click.png');
+  imageList.tutorialXIdle = loadImage('./assets/images/UI_Window_Wormgame_Tutorial_Button_X_Idle.png');
+  imageList.tutorialXClick = loadImage('./assets/images/UI_Window_Wormgame_Tutorial_Button_X_Click.png');
+
   //desktop
   imageList.bg = loadImage('./assets/images/UI_BackGround.png');
   imageList.bucketIdle = loadImage('./assets/images/UI_Icon_Bucket_Idle.png');
   imageList.bucketClick = loadImage('./assets/images/UI_Icon_Bucket_Click.png');
   imageList.wormGameIdle = loadImage('./assets/images/UI_Icon_wormgame_idle.png');
   imageList.wormGameClick = loadImage('./assets/images/UI_Icon_wormgame_click.png');
+  imageList.appleIdle = loadImage('./assets/images/UI_Icon_apple_idle.png');
+  imageList.appleClick = loadImage('./assets/images/UI_Icon_apple_click.png');
 
   //game window
-  imageList.gameWindow =  loadImage('./assets/images/UI_Window_Wormgame.png');
-  imageList.gameWindowXClick =  loadImage('./assets/images/UI_Window_Wormgame_X_Click.png');
-  imageList.gameWindowXIdle =  loadImage('./assets/images/UI_Window_Wormgame_X_Idle.png');
-  imageList.gameWindowFullscreenClick =  loadImage('./assets/images/UI_Window_Wormgame_Fullscreen_Click.png');
-  imageList.gameWindowFullscreenIdle =  loadImage('./assets/images/UI_Window_Wormgame_Fullscreen_Idle.png');
-  imageList.gameWindowPauseClick =  loadImage('./assets/images/UI_Window_Wormgame_Pause_Click.png');
-  imageList.gameWindowPauseIdle =  loadImage('./assets/images/UI_Window_Wormgame_Pause_Idle.png');
-  
+  imageList.gameWindow = loadImage('./assets/images/UI_Window_Wormgame.png');
+  imageList.gameWindowXClick = loadImage('./assets/images/UI_Window_Wormgame_X_Click.png');
+  imageList.gameWindowXIdle = loadImage('./assets/images/UI_Window_Wormgame_X_Idle.png');
+  imageList.gameWindowFullscreenClick = loadImage('./assets/images/UI_Window_Wormgame_Fullscreen_Click.png');
+  imageList.gameWindowFullscreenIdle = loadImage('./assets/images/UI_Window_Wormgame_Fullscreen_Idle.png');
+  imageList.gameWindowPauseClick = loadImage('./assets/images/UI_Window_Wormgame_Pause_Click.png');
+  imageList.gameWindowPauseIdle = loadImage('./assets/images/UI_Window_Wormgame_Pause_Idle.png');
+
   //pause
-  imageList.pauseWindow =  loadImage('./assets/images/UI_Window_Pause.png');
-  imageList.resumeIdle =  loadImage('./assets/images/UI_Window_Pause_Button_Idle.png');
-  imageList.resumeClick =  loadImage('./assets/images/UI_Window_Pause_Button_Click.png');
-  
+  imageList.pauseWindow = loadImage('./assets/images/UI_Window_Pause.png');
+  imageList.resumeIdle = loadImage('./assets/images/UI_Window_Pause_Button_Idle.png');
+  imageList.resumeClick = loadImage('./assets/images/UI_Window_Pause_Button_Click.png');
+
   //worm
   imageList.wormHeadIdle = loadImage('./assets/images/Char_Head_Idle.png');
   imageList.wormBody = loadImage('./assets/images/Char_Body.png');
+
+  //food
+  imageList.good = [];
+  imageList.good.push(loadImage('./assets/images/food/T_Food_Good_Apple.png'));
+  imageList.good.push(loadImage('./assets/images/food/T_Food_Good_Banana.png'));
+  imageList.good.push(loadImage('./assets/images/food/T_Food_Good_Carrot.png'));
+  imageList.good.push(loadImage('./assets/images/food/T_Food_Good_Coffee.png'));
+  imageList.good.push(loadImage('./assets/images/food/T_Food_Good_Egg.png'));
+  imageList.good.push(loadImage('./assets/images/food/T_Food_Good_Greens.png'));
+  imageList.good.push(loadImage('./assets/images/food/T_Food_Good_leaves.png'));
+  imageList.good.push(loadImage('./assets/images/food/T_Food_Good_paper.png'));
+  imageList.good.push(loadImage('./assets/images/food/T_Food_Good_teabag.png'));
+  imageList.good.push(loadImage('./assets/images/food/T_Food_Good_tomato.png'));
+  imageList.bad = [];
+  imageList.bad.push(loadImage('./assets/images/food/T_Food_Bad_Cheese.png'));
+  imageList.bad.push(loadImage('./assets/images/food/T_Food_Bad_Chili.png'));
+  imageList.bad.push(loadImage('./assets/images/food/T_Food_Bad_Citrus.png'));
+  imageList.bad.push(loadImage('./assets/images/food/T_Food_Bad_Garlic.png'));
+  imageList.bad.push(loadImage('./assets/images/food/T_Food_Bad_Meat.png'));
+  imageList.bad.push(loadImage('./assets/images/food/T_Food_Bad_Oil.png'));
+  imageList.bad.push(loadImage('./assets/images/food/T_Food_Bad_Onion.png'));
+  imageList.bad.push(loadImage('./assets/images/food/T_Food_Bad_Pineapple.png'));
+
+  //facts
+  imageList.facts = [];
+  for (let i = 1; i <= 8; i++) {
+    imageList.facts.push(loadImage('./assets/images/facts/UI_Window_Wormfact_0' + i + '.png'));
+  }
+  imageList.factXIdle = loadImage('./assets/images/facts/UI_Window_Wormfact_Button_X_Idle.png')
+  imageList.factXClick = loadImage('./assets/images/facts/UI_Window_Wormfact_Button_X_Click.png')
 }
 
 function setup() {
-  
+  cursor('./assets/images/Cursor.png', 3, 4);
   cnv = createCanvas(divWidth, divHeight);
   cnv.elt.style.left = "50%";
   cnv.elt.style.top = "50%";
   cnv.elt.style.transform = 'translate(-50%,-50%)';
-  
+
   cnv.parent("worm-game");
-  
+
   game = new StateManager();
   // console.log( imageList.pauseWindow.width, imageList.pauseWindow.height);
 
@@ -69,10 +112,18 @@ function draw() {
   game.update();
   game.draw();
 
-  if(mouseIsPressed){
+  if (mouseIsPressed) {
     checkButtonHold(mouseX, mouseY);
   }
-
+  push();
+  textFont(retroFont);
+  textSize(height * 0.1);
+  fill('pink');
+  text(game.level, width * 0.1, height * 0.1);
+  text(game.score, width * 0.1, height * 0.2);
+  text(game.life, width * 0.1, height * 0.3);
+  pop();
+  // console.log(game.level);
   if (bIsDebugMode) {
     push();
     fill('black');
@@ -138,9 +189,9 @@ function keyPressed() {
       break;
     case ENTER:
       if (game.state == 'ready') {
-        game.startGame();
+        // game.startGame();
       } else if (game.state == 'play' || game.state == 'pause') {
-        game.togglePause();
+        // game.togglePause();
       }
       break;
     default:
@@ -170,7 +221,7 @@ function swipeControlStart() {
   checkButtonHold(mouseX, mouseY)
 }
 
-function checkButtonHold(xPos, yPos){
+function checkButtonHold(xPos, yPos) {
   if (bIsMobileFullscreen) {
     game.checkButtons(yPos, height - xPos, HOLD);
   } else {
@@ -187,7 +238,7 @@ function swipeControlEnd() {
     bButtonWasClicked = game.checkButtons(mouseX, mouseY);
   }
 
-  if (!bButtonWasClicked && game.state == 'play' && mouseDown != undefined) {
+  if (isMobile && !bButtonWasClicked && game.state == 'play' && mouseDown != undefined) {
     //game swipe controls
     let mouseVec = createVector(mouseX, mouseY);//get current mouse or touch location
     game.board.swipeControl(mouseDown, mouseVec);
