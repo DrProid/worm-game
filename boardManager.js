@@ -288,7 +288,7 @@ class BoardElement {
             angleMode(RADIANS);//just in case we aren't in radians mode
             let result = map(mouseEnd.heading(), -PI, PI, 0, 4);//convert to 4 cardinal directions
             result = round(result, 0);//round to nearest whole number
-            if (bIsMobileFullscreen) {
+            if (bIsMobileFullscreen && divHeight > divWidth) {
                 result += 3;
             }
             result %= 4; //4 and 0 are the same direction

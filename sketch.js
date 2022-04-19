@@ -230,7 +230,7 @@ function swipeControlStart() {
 }
 
 function checkButtonHold(xPos, yPos) {
-  if (bIsMobileFullscreen) {
+  if (bIsMobileFullscreen && divHeight > divWidth) {
     game.checkButtons(yPos, height - xPos, HOLD);
   } else {
     game.checkButtons(xPos, yPos, HOLD);
@@ -240,7 +240,7 @@ function checkButtonHold(xPos, yPos) {
 function swipeControlEnd() {
 
   let bButtonWasClicked = false;
-  if (bIsMobileFullscreen) {
+  if (bIsMobileFullscreen && divHeight > divWidth) {
     bButtonWasClicked = game.checkButtons(mouseY, height - mouseX);
   } else {
     bButtonWasClicked = game.checkButtons(mouseX, mouseY);
