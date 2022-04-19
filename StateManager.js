@@ -86,8 +86,8 @@ class StateManager {
     }
   }
 
-  addGameWindow(parentPos, parentDim, anchor, image, cols, rows) {
-    this.board = new BoardElement(parentPos, parentDim, anchor, image, cols, rows);
+  addGameWindow(parentPos, parentDim, image, cols, rows) {
+    this.board = new BoardElement(parentPos, parentDim, image, cols, rows);
   }
 
   checkButtons(xPos, yPos, type) {

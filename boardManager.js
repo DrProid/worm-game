@@ -256,7 +256,7 @@ class BoardElement {
         } else {
             this.gridSize = parentDim.width / this.cols;
         }
-        this.gridSize *= 0.85;
+        this.gridSize *= 0.8;
 
         this.dim.width = this.cols * this.gridSize;
         this.dim.height = this.rows * this.gridSize;
