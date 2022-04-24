@@ -132,6 +132,8 @@ class StateManager {
       case 'play':
         this.overBoardUIElements.gameOver.setVisible(false);
         this.overBoardUIElements.gameOver.setInteractable(false);
+        this.underBoardUIElements.tutorial.setVisible(false);
+        this.underBoardUIElements.tutorial.setInteractable(false);
         this.overBoardUIElements.pause.setVisible(false);
         this.overBoardUIElements.pause.setInteractable(false);
         this.underBoardUIElements.desktop.setInteractable(false);
@@ -145,6 +147,7 @@ class StateManager {
           this.life = 3;
           this.score = 0;
           this.board.foods = [];
+          gameStartSound();
         }
         this.removeWormFact();
         break;
@@ -157,6 +160,7 @@ class StateManager {
         this.overBoardUIElements.gameOver.elements.score.text = this.score;
         this.overBoardUIElements.gameOver.setVisible(true);
         this.overBoardUIElements.gameOver.setInteractable(true);
+        // gameStartSound();
         break;
       default:
         console.error("unknown state sent to changeState : " + state);
@@ -192,14 +196,16 @@ class StateManager {
     }
 
     if (change.foodChange > 0) {
+      goodSound();
       this.goodFoodsEaten += change.foodChange;//count the food to track level changes
       //speed/slow up game, increase/decrease max food
       this.level = floor(this.goodFoodsEaten / 5);
       this.board.maxFood = floor(map(this.level, 0, 20, 5, 20, true));
-      this.board.gameTick = map(this.level, 0, 15, 300, 50, true);
+      this.board.gameTick = 1000 / map(this.level, 0, 15, 4, 15, true);
       this.board.maxBoost = map(this.level, 0, 15, 3, 1, true);
       this.board.goodFoodChance = map(this.level, 0, 20, 1, 0.5, true);
     } else if (change.foodChange < 0) {
+      badSound();
       this.life--;
       if (this.life <= 0) {
         this.changeState('gameOver');
@@ -302,11 +308,11 @@ function handleVisibilityChange() {
     if (game.state == 'play') {
       game.togglePause('pause');
     }
-    bgm.pause(backgroundMusic);
-  } else {
-    if(!bgm.playing(backgroundMusic)){
-      var backgroundMusic = bgm.play();
-    }
+  //   bgm.pause(backgroundMusic);
+  // } else {
+  //   if(!bgm.playing(backgroundMusic)){
+  //     var backgroundMusic = bgm.play();
+  //   }
   }
 }
 

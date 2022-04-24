@@ -255,7 +255,9 @@ function makeWelcomeUI(parent) {
     anchor.heightRatio = imageList.tutorialOkClick.height / imageList.tutorialOkClick.width;
     anchor.yOffPct = 0.9;
     parent.underBoardUIElements.tutorial.addButtonElement("tutorialOk", { ...anchor }, [imageList.tutorialOkIdle, imageList.tutorialOkClick], "OK", () => {
-        parent.changeState('ready');
+        // parent.changeState('ready');
+        boopSound();
+        parent.startGame();
     });
 
     anchor.widthPct = 0.05
@@ -266,6 +268,7 @@ function makeWelcomeUI(parent) {
     anchor.yOffPct = 0.015;
     parent.underBoardUIElements.tutorial.addButtonElement("tutorialX", { ...anchor }, [imageList.tutorialXIdle, imageList.tutorialXClick], "X", () => {
         parent.changeState('ready');
+        boopSound();
     });
 }
 
@@ -285,6 +288,7 @@ function makePauseUI(parent) {
     anchor.yOffPct = 0.8;
     parent.overBoardUIElements.pause.addButtonElement("unpause", { ...anchor }, [imageList.resumeIdle, imageList.resumeClick], "UNPAUSE", () => {
         parent.togglePause();
+        boopSound();
     });
 }
 
@@ -310,6 +314,7 @@ function makeGameOver(parent) {
     anchor.yOffPct = 0.9;
     parent.overBoardUIElements.gameOver.addButtonElement("playAgain", { ...anchor }, [imageList.playAgainIdle, imageList.playAgainClick], "play again", () => {
         parent.startGame();
+        boopSound();
     });
 }
 
@@ -331,8 +336,9 @@ function makeDesktop(parent) {
     btnAnchor.heightPct = 0.2;
     btnAnchor.widthRatio = 1;
     parent.underBoardUIElements.desktop.addButtonElement("bucket", { ...btnAnchor }, [imageList.bucketIdle, imageList.bucketClick], "", () => {
-        // console.log("bucket pressed");
-        parent.changeState('tutorial');
+        console.log("bucket pressed");
+        mouseSound();
+        // parent.changeState('tutorial');
     });
 
 
@@ -343,13 +349,16 @@ function makeDesktop(parent) {
             bIsMobileFullscreen = true;
             fullscreen(true);
         }
-        parent.startGame();
+        // parent.startGame();
+        parent.changeState('tutorial');
+        boopSound();
     });
 
     btnAnchor.yOffPct = 0.6;
     parent.underBoardUIElements.desktop.addButtonElement("apple", { ...btnAnchor }, [imageList.appleIdle, imageList.appleClick], "", () => {
         // console.log("apple pressed"); 
         parent.makeWormFact();
+        boopSound();
     });
 
     parent.underBoardUIElements.desktop.setVisible(true);
@@ -369,6 +378,7 @@ function makeGameWindow(parent) {
 
     parent.board.addButtonElement("close", { ...btnAnchor }, [imageList.gameWindowXIdle, imageList.gameWindowXClick], "", () => {
         parent.changeState('ready');
+        boopSound();
     });
 
     btnAnchor.xOffPct = 0.95;
@@ -383,12 +393,14 @@ function makeGameWindow(parent) {
             suppressPauseTimer = millis() + 100;
             fullscreen(!fs);
         }
+        boopSound();
     });
 
     btnAnchor.xOffPct = 0.90;
     parent.board.addButtonElement("pause", { ...btnAnchor }, [imageList.gameWindowPauseIdle, imageList.gameWindowPauseClick], "", () => {
         // console.log("pause clicked");
         parent.togglePause();
+        boopSound();
     });
 
 }
@@ -411,6 +423,7 @@ function makeWormFact(parent) {
     parent.overBoardUIElements.fact.addButtonElement("factX", { ...anchor }, [imageList.factXIdle, imageList.factXClick], "X", () => {
         // console.log("close fact");
         parent.removeWormFact();
+        boopSound();
     });
 
 }

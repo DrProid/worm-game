@@ -477,16 +477,28 @@ class Worm {
 
         switch (direction) {
             case LEFT:
-                if (pos.x > 0 && lastDirection != RIGHT) this.direction = direction;
+                if (pos.x > 0 && lastDirection != RIGHT) {
+                    this.direction = direction;
+                    turnSound();
+                }
                 break;
             case RIGHT:
-                if (pos.x < (cols - 1) && lastDirection != LEFT) this.direction = direction;
+                if (pos.x < (cols - 1) && lastDirection != LEFT) {
+                    this.direction = direction;
+                    turnSound();
+                }
                 break;
             case UP:
-                if (pos.y > 0 && lastDirection != DOWN) this.direction = direction;
+                if (pos.y > 0 && lastDirection != DOWN) {
+                    this.direction = direction;
+                    turnSound();
+                }
                 break;
             case DOWN:
-                if (pos.y < (rows - 1) && lastDirection != UP) this.direction = direction;
+                if (pos.y < (rows - 1) && lastDirection != UP) {
+                    this.direction = direction;
+                    turnSound();
+                }
                 break;
             default:
                 console.error("Worm recieved something that isnt a direction : " + direction);

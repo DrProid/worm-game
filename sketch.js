@@ -10,7 +10,7 @@ const HOLD = "hold";
 let mouseDown;
 
 let bIsDebugMode = false;
-let version = "v0.191";
+let version = "v0.192";
 
 let suppressPauseTimer = 0;
 
@@ -134,14 +134,16 @@ function draw() {
 
   if (bIsDebugMode) {
     push();
-    fill('black');
+    fill('white');
+    textSize(20);
     text(version, 20, 20)
-    text(width, 60, 60);
-    text(height, 160, 60);
-    text(windowWidth, 60, 80);
-    text(windowHeight, 160, 80);
-    text(displayWidth, 60, 100);
-    text(displayHeight, 160, 100);
+    // text(width, 60, 60);
+    // text(height, 160, 60);
+    // text(windowWidth, 60, 80);
+    // text(windowHeight, 160, 80);
+    // text(displayWidth, 60, 100);
+    // text(displayHeight, 160, 100);
+    text(game.level, 60,60)
     text(nfs(frameRate(), 3, 1), 100, 20);
     pop();
   }
