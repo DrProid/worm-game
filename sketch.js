@@ -125,9 +125,15 @@ function setup() {
 function draw() {
   background(220);
 
+  //if images haven't loaded
+    //display the loading screen
+  
+  //else
+
   game.update();
   game.draw();
 
+  //check to see if any of the icons are being held down
   if (mouseIsPressed) {
     checkButtonHold(mouseX, mouseY);
   }
@@ -228,7 +234,8 @@ function mouseReleased() {
 
 function swipeControlStart() {
   mouseDown = createVector(mouseX, mouseY);//store the position of the mouse when it is pressed
-  checkButtonHold(mouseX, mouseY)
+  checkButtonHold(mouseX, mouseY);
+  mouseSound();
 }
 
 function checkButtonHold(xPos, yPos) {

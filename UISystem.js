@@ -337,7 +337,7 @@ function makeDesktop(parent) {
     btnAnchor.widthRatio = 1;
     parent.underBoardUIElements.desktop.addButtonElement("bucket", { ...btnAnchor }, [imageList.bucketIdle, imageList.bucketClick], "", () => {
         console.log("bucket pressed");
-        mouseSound();
+        boopSound();
         // parent.changeState('tutorial');
     });
 
