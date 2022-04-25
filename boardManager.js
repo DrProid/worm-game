@@ -241,7 +241,7 @@ class BoardElement {
         return bHitWall;
     }
     changeDirection(direction) {
-        if(direction == this.worm.direction){
+        if (direction == this.worm.direction) {
             this.boost = lerp(this.boost, this.maxBoost, 0.3);
         } else {
             this.boost = 1;

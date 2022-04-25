@@ -201,8 +201,8 @@ class BoxElement extends UI {
         super.draw();
         push();
         colorMode(HSB, 255);
-        let col = color(hue(this.colour), 200, brightness(this.colour)*0.8);
-        
+        let col = color(hue(this.colour), 200, brightness(this.colour) * 0.8);
+
         noStroke();
         let edgeWidth = this.dim.width * 0.01;
         fill(col);
@@ -213,7 +213,7 @@ class BoxElement extends UI {
         vertex(this.pos.xOff + this.dim.width, this.pos.yOff + this.dim.height);
         vertex(this.pos.xOff + this.dim.width - edgeWidth, this.pos.yOff + this.dim.height - edgeWidth);
         endShape();
-        
+
         col = color(hue(this.colour), 200, brightness(this.colour) * 0.5);
         fill(col);
         beginShape();
@@ -582,7 +582,7 @@ function makeScraps(parent) {
     parent.underBoardUIElements.scraps.addBoxElement("goodBox", { ...anchor }, color('#4ef451'));
     anchor.yOffPct = 0.55;
     parent.underBoardUIElements.scraps.addBoxElement("badBox", { ...anchor }, color('#bc5640'));
-    
+
     anchor.widthPct = 0;
     anchor.heightPct = 0.02;
     anchor.xOffPct = 0.5;
@@ -599,9 +599,9 @@ function makeScraps(parent) {
     anchor.heightPct = 0.1;
     anchor.widthRatio = 1.5;
     anchor.yOffPct = 0.97;
-    anchor.xOffPct = 3/8;
+    anchor.xOffPct = 3 / 8;
     parent.underBoardUIElements.scraps.addTextElement("love0", { ...anchor }, imageList.life, "");
-    anchor.xOffPct = 5/8;
+    anchor.xOffPct = 5 / 8;
     parent.underBoardUIElements.scraps.addTextElement("love1", { ...anchor }, imageList.life, "");
     anchor.heightPct = 0.05;
     anchor.widthRatio = 1;
@@ -614,16 +614,16 @@ function makeScraps(parent) {
     anchor.widthRatio = 1;
     for (let i in imageList.good) {
         let row = floor(i / 5);
-        anchor.yOffPct = row*0.1 + 0.2;
+        anchor.yOffPct = row * 0.1 + 0.2;
 
-        anchor.xOffPct = map(i%5, 0, 4, 0.2, 0.8);
+        anchor.xOffPct = map(i % 5, 0, 4, 0.2, 0.8);
         parent.underBoardUIElements.scraps.addTextElement("good" + i, { ...anchor }, imageList.good[i], "");
     }
 
     for (let i in imageList.bad) {
         let row = floor(i / 4);
-        anchor.yOffPct = row*0.1 + 0.5;
-        anchor.xOffPct = map(i%4, 0, 3, 0.2, 0.8);
+        anchor.yOffPct = row * 0.1 + 0.5;
+        anchor.xOffPct = map(i % 4, 0, 3, 0.2, 0.8);
         parent.underBoardUIElements.scraps.addTextElement("bad" + i, { ...anchor }, imageList.bad[i], "");
     }
 }

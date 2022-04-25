@@ -325,11 +325,11 @@ function handleVisibilityChange() {
     if (game.state == 'play') {
       game.togglePause('pause');
     }
-  //   bgm.pause(backgroundMusic);
-  // } else {
-  //   if(!bgm.playing(backgroundMusic)){
-  //     var backgroundMusic = bgm.play();
-  //   }
+    //   bgm.pause(backgroundMusic);
+    // } else {
+    //   if(!bgm.playing(backgroundMusic)){
+    //     var backgroundMusic = bgm.play();
+    //   }
   }
 }
 

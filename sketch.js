@@ -128,8 +128,8 @@ function draw() {
   background(220);
 
   //if images haven't loaded
-    //display the loading screen
-  
+  //display the loading screen
+
   //else
 
   game.update();
@@ -151,7 +151,7 @@ function draw() {
     // text(windowHeight, 160, 80);
     // text(displayWidth, 60, 100);
     // text(displayHeight, 160, 100);
-    text(game.level, 60,60)
+    text(game.level, 60, 60)
     text(nfs(frameRate(), 3, 1), 100, 20);
     pop();
   }
@@ -249,9 +249,9 @@ function checkButtonHold(xPos, yPos) {
 }
 
 function swipeControlEnd() {
-  
+
   let bButtonWasClicked = false;
-  if(game.state == "scraps"){
+  if (game.state == "scraps") {
     //override of scraps to go away on a click anywhere
     game.changeState('ready');
     game.underBoardUIElements.scraps.elements.scrapsX.state = 0;
