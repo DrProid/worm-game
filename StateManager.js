@@ -210,7 +210,13 @@ class StateManager {
       goodSound();
       this.goodFoodsEaten += change.foodChange;//count the food to track level changes
       //speed/slow up game, increase/decrease max food
+      let temp = this.level;
       this.level = floor(this.goodFoodsEaten / 5);
+      if (temp != this.level) {
+        this.board.levelUp = true;
+        // console.log("level up");
+        gameStartSound();
+      }
       this.board.maxFood = floor(map(this.level, 0, 20, 5, 20, true));
       this.board.gameTick = 1000 / map(this.level, 0, 15, 4, 15, true);
       this.board.maxBoost = map(this.level, 0, 15, 3, 1, true);

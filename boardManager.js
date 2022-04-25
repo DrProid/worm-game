@@ -29,6 +29,7 @@ class BoardElement {
         this.boost = 1;
         this.maxBoost = 3;
         this.gameTick = 250;//milliseconds between actual changes to the board (not animations)
+        this.levelUp = false;
 
     }
     setVisible(bIsVisible) {
@@ -164,12 +165,13 @@ class BoardElement {
             //check for worm movement
             if (this.timeKeeper >= this.gameTick) {
                 this.timeKeeper -= this.gameTick;
-                this.worm.move(false);
+                this.worm.move(this.levelUp);
+                this.levelUp = false;
                 this.worm.headOverride = undefined;
                 collideData = this.checkCollision();
-                if(collideData.foodChange > 0){
+                if (collideData.foodChange > 0) {
                     this.worm.headOverride = imageList.wormHeadGood;
-                } else if(collideData.foodChange < 0){
+                } else if (collideData.foodChange < 0) {
                     this.worm.headOverride = imageList.wormHeadBad;
                 }
             } else {
@@ -392,7 +394,7 @@ class Worm {
 
                 let extendAnim = 2;
                 let alpha = lerp(-1, extendAnim, 1 - animPercent);
-                let rateOfChange = 1.8;
+                let rateOfChange = 3;
                 alpha = constrain(-pow(-alpha + rateOfChange * subSegIndex / totalSubSegments, 3) + 1, 0, 1);
                 alpha = (alpha * -1) + 1;
 
@@ -523,7 +525,7 @@ class Food {
     }
     isVacant(x, y) {
         if (x >= this.x && x <= this.x + 2 && y >= this.y && y <= this.y + 2) {
-            return (this.bIsGood ? 1 : -1);
+            return (this.bIsGood ? 1 + round(map(this.timer, 0, 20000, 0, 1, true), 2) : -1);
         } else {
             return 0;
         }
