@@ -168,7 +168,7 @@ class StateManager {
         this.underBoardUIElements.desktop.setInteractable(false);
         break;
       case 'gameOver':
-        this.overBoardUIElements.gameOver.elements.score.text = this.score;
+        this.overBoardUIElements.gameOver.elements.score.text = round(this.score);
         this.overBoardUIElements.gameOver.setVisible(true);
         this.overBoardUIElements.gameOver.setInteractable(true);
         // gameStartSound();
@@ -209,7 +209,7 @@ class StateManager {
         } else {
           this.greenFlash = 0;
         }
-        fill(0, 255, 0, this.greenFlash);
+        fill(0, 255, 255, this.greenFlash);
         rect(0, 0, width, height);
         pop();
       }
@@ -231,7 +231,7 @@ class StateManager {
     this.score += change.foodChange * 100 * (this.level + 1);//earn/lose more points for food at higher levels
 
     this.score += change.scoreChange * 100;//hit a wall deduct 100 points
-    this.underBoardUIElements.score.elements.score.text = this.score;
+    this.underBoardUIElements.score.elements.score.text = round(this.score);
     for (let i = 3; i > this.life; i--) {
       this.underBoardUIElements.lives.elements['life' + i].setVisible(false);
     }
