@@ -95,6 +95,9 @@ class UIContainer extends UI {
         super(parentPos, parentDim, anchor, image);
         this.elements = {};
     }
+    addBoxElement(name, anchor, colour) {
+        this.elements[name] = new BoxElement(this.pos, this.dim, anchor, colour);
+    }
     addTextElement(name, anchor, image, text) {
         this.elements[name] = new TextElement(this.pos, this.dim, anchor, image, text);
     }
@@ -124,6 +127,33 @@ class UIContainer extends UI {
     }
     draw() {
         super.draw();
+        if (!this.image && this.visible) {
+            push();
+            noStroke();
+            let edgeWidth = this.dim.width * 0.01;
+            fill('#F4EF97');
+            beginShape();
+            vertex(this.pos.xOff + edgeWidth, this.pos.yOff + edgeWidth);
+            vertex(this.pos.xOff, this.pos.yOff);
+            vertex(this.pos.xOff + this.dim.width, this.pos.yOff);
+            vertex(this.pos.xOff + this.dim.width, this.pos.yOff + this.dim.height);
+            vertex(this.pos.xOff + this.dim.width - edgeWidth, this.pos.yOff + this.dim.height - edgeWidth);
+            endShape();
+
+            fill('#07004B');
+            beginShape();
+            vertex(this.pos.xOff + edgeWidth, this.pos.yOff + edgeWidth);
+            vertex(this.pos.xOff, this.pos.yOff);
+            vertex(this.pos.xOff, this.pos.yOff + this.dim.height);
+            vertex(this.pos.xOff + this.dim.width, this.pos.yOff + this.dim.height);
+            vertex(this.pos.xOff + this.dim.width - edgeWidth, this.pos.yOff + this.dim.height - edgeWidth);
+            endShape();
+
+            fill('grey');
+            rect(this.pos.xOff + edgeWidth, this.pos.yOff + edgeWidth, this.dim.width - edgeWidth * 2, this.dim.height - edgeWidth * 2);
+
+            pop();
+        }
         if (this.visible) {
             for (let name in this.elements) {
                 this.elements[name].draw();
@@ -153,10 +183,50 @@ class TextElement extends UI {
     draw() {
         super.draw();
         push();
+        let bbox = retroFont.textBounds(this.text, 0, 0, this.dim.height);
         textFont(retroFont);
         textAlign(CENTER, CENTER);//align to the center of the box
         textSize(this.dim.height);
-        text(this.text, this.pos.xOff, this.pos.yOff + this.dim.height / 2, this.dim.width);
+        text(this.text, this.pos.xOff - bbox.w, this.pos.yOff + this.dim.height / 2, bbox.w * 2);
+        pop();
+    }
+}
+
+class BoxElement extends UI {
+    constructor(parentPos, parentDim, anchor, colour) {
+        super(parentPos, parentDim, anchor);
+        this.colour = colour;
+    }
+    draw() {
+        super.draw();
+        push();
+        colorMode(HSB, 255);
+        let col = color(hue(this.colour), 200, brightness(this.colour)*0.8);
+        
+        noStroke();
+        let edgeWidth = this.dim.width * 0.01;
+        fill(col);
+        beginShape();
+        vertex(this.pos.xOff + edgeWidth, this.pos.yOff + edgeWidth);
+        vertex(this.pos.xOff, this.pos.yOff);
+        vertex(this.pos.xOff + this.dim.width, this.pos.yOff);
+        vertex(this.pos.xOff + this.dim.width, this.pos.yOff + this.dim.height);
+        vertex(this.pos.xOff + this.dim.width - edgeWidth, this.pos.yOff + this.dim.height - edgeWidth);
+        endShape();
+        
+        col = color(hue(this.colour), 200, brightness(this.colour) * 0.5);
+        fill(col);
+        beginShape();
+        vertex(this.pos.xOff + edgeWidth, this.pos.yOff + edgeWidth);
+        vertex(this.pos.xOff, this.pos.yOff);
+        vertex(this.pos.xOff, this.pos.yOff + this.dim.height);
+        vertex(this.pos.xOff + this.dim.width, this.pos.yOff + this.dim.height);
+        vertex(this.pos.xOff + this.dim.width - edgeWidth, this.pos.yOff + this.dim.height - edgeWidth);
+        endShape();
+
+        fill(this.colour);
+        rect(this.pos.xOff + edgeWidth, this.pos.yOff + edgeWidth, this.dim.width - edgeWidth * 2, this.dim.height - edgeWidth * 2);
+
         pop();
     }
 }
@@ -336,7 +406,8 @@ function makeDesktop(parent) {
     btnAnchor.heightPct = 0.2;
     btnAnchor.widthRatio = 1;
     parent.underBoardUIElements.desktop.addButtonElement("bucket", { ...btnAnchor }, [imageList.bucketIdle, imageList.bucketClick], "", () => {
-        console.log("bucket pressed");
+        // console.log("bucket pressed");
+        parent.changeState('scraps');
         boopSound();
         // parent.changeState('tutorial');
     });
@@ -428,7 +499,7 @@ function makeWormFact(parent) {
 
 }
 
-function makeTaskBar(parent){
+function makeTaskBar(parent) {
     let anchor = defaultAnchor();
     anchor.xOffPct = 0;
     anchor.yOffPct = 1;
@@ -440,15 +511,15 @@ function makeTaskBar(parent){
 
     anchor.heightPct = 0.9;
     anchor.widthRatio = imageList.life.width / imageList.life.height;
-    anchor.xOffPct = 1/4;
+    anchor.xOffPct = 1 / 4;
     anchor.yOffPct = 0.5;
     anchor.horz = CENTER;
     anchor.vert = CENTER;
-    parent.underBoardUIElements.lives.addTextElement("life1", {...anchor}, imageList.life, "");
-    anchor.xOffPct = 2/4;
-    parent.underBoardUIElements.lives.addTextElement("life2", {...anchor}, imageList.life, "");
-    anchor.xOffPct = 3/4;
-    parent.underBoardUIElements.lives.addTextElement("life3", {...anchor}, imageList.life, "");
+    parent.underBoardUIElements.lives.addTextElement("life1", { ...anchor }, imageList.life, "");
+    anchor.xOffPct = 2 / 4;
+    parent.underBoardUIElements.lives.addTextElement("life2", { ...anchor }, imageList.life, "");
+    anchor.xOffPct = 3 / 4;
+    parent.underBoardUIElements.lives.addTextElement("life3", { ...anchor }, imageList.life, "");
 
     anchor.xOffPct = 1;
     anchor.yOffPct = 1;
@@ -458,11 +529,91 @@ function makeTaskBar(parent){
     anchor.widthRatio = imageList.scoreWindow.width / imageList.scoreWindow.height;
     parent.addUI("score", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.scoreWindow, false);
 
-    anchor.xOffPct = 0.5;
-    anchor.yOffPct = 0.45;
+    anchor.xOffPct = 0.625;
+    anchor.yOffPct = 0.5;
     anchor.heightPct = 0.3;
     anchor.widthRatio = undefined;
     anchor.horz = CENTER;
     anchor.vert = CENTER;
-    parent.underBoardUIElements.score.addTextElement("score", {...anchor}, undefined, "score");
+    parent.underBoardUIElements.score.addTextElement("score", { ...anchor }, undefined, "score");
+}
+
+function makeScraps(parent) {
+    let anchor = defaultAnchor();
+    anchor.xOffPct = 0.5;
+    anchor.yOffPct = 0.5;
+    anchor.horz = CENTER;
+    anchor.vert = CENTER;
+    anchor.heightPct = 0.9;
+    anchor.widthRatio = 0.5;
+    // anchor.heightRatio = imageList.facts[0].height / imageList.facts[0].width;
+    parent.addUI("scraps", fullScreenPos(), fullScreenDim(), { ...anchor }, undefined, false);
+
+    anchor.xOffPct = 0.98;
+    anchor.yOffPct = 0.01;
+    anchor.vert = TOP;
+    anchor.horz = RIGHT;
+    anchor.widthPct = 0.05;
+    anchor.heightRatio = 1;
+    anchor.widthRatio = undefined;
+    parent.underBoardUIElements.scraps.addButtonElement("scrapsX", { ...anchor }, [imageList.factXIdle, imageList.factXClick], "X", () => {
+        // console.log("close fact");
+        // parent.removeWormFact();
+        boopSound();
+        parent.changeState('ready');
+    });
+
+    anchor.widthRatio = undefined;
+    anchor.heightRatio = undefined;
+    anchor.horz = CENTER;
+    anchor.vert = CENTER;
+    anchor.xOffPct = 0.525;
+    anchor.heightPct = 0.03;
+    anchor.yOffPct = 0.125;
+    parent.underBoardUIElements.scraps.addTextElement("goodTitle", { ...anchor }, undefined, "Good Foods for Worms");
+    anchor.yOffPct = 0.425;
+    parent.underBoardUIElements.scraps.addTextElement("badTitle", { ...anchor }, undefined, "Bad Foods for Worms");
+    anchor.xOffPct = 0.5;
+    anchor.yOffPct = 0.25;
+    anchor.widthPct = 0.9;
+    anchor.heightPct = 0.2;
+    parent.underBoardUIElements.scraps.addBoxElement("goodBox", { ...anchor }, color('#4ef451'));
+    anchor.yOffPct = 0.55;
+    parent.underBoardUIElements.scraps.addBoxElement("badBox", { ...anchor }, color('#bc5640'));
+    
+    anchor.widthPct = 0.001;
+    anchor.heightPct = 0.02;
+    anchor.xOffPct = 0.5;
+    anchor.yOffPct = 0.7;
+    parent.underBoardUIElements.scraps.addTextElement("Inge", { ...anchor }, undefined, "Art - Inge Berman");
+    anchor.yOffPct = 0.75;
+    parent.underBoardUIElements.scraps.addTextElement("Joel", { ...anchor }, undefined, "Code - Joel Flanagan");
+    anchor.yOffPct = 0.8;
+    parent.underBoardUIElements.scraps.addTextElement("Leo", { ...anchor }, undefined, "Audio - Leo Sunshine");
+    anchor.heightPct = 0.03;
+    anchor.yOffPct = 0.9;
+    parent.underBoardUIElements.scraps.addTextElement("credits", { ...anchor }, undefined, "Thanks for playing!");
+
+    anchor.heightPct = 0.1;
+    anchor.widthRatio = 1.5;
+    anchor.yOffPct = 0.95;
+    parent.underBoardUIElements.scraps.addTextElement("love", { ...anchor }, imageList.life, "");
+
+
+    anchor.heightPct = 0.05;
+    anchor.widthRatio = 1;
+    for (let i in imageList.good) {
+        let row = floor(i / 5);
+        anchor.yOffPct = row*0.1 + 0.2;
+
+        anchor.xOffPct = map(i%5, 0, 4, 0.2, 0.8);
+        parent.underBoardUIElements.scraps.addTextElement("good" + i, { ...anchor }, imageList.good[i], "");
+    }
+
+    for (let i in imageList.bad) {
+        let row = floor(i / 4);
+        anchor.yOffPct = row*0.1 + 0.5;
+        anchor.xOffPct = map(i%4, 0, 3, 0.2, 0.8);
+        parent.underBoardUIElements.scraps.addTextElement("bad" + i, { ...anchor }, imageList.bad[i], "");
+    }
 }

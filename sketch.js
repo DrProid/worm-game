@@ -247,8 +247,13 @@ function checkButtonHold(xPos, yPos) {
 }
 
 function swipeControlEnd() {
-
+  
   let bButtonWasClicked = false;
+  if(game.state == "scraps"){
+    //override of scraps to go away on a click anywhere
+    game.changeState('ready');
+    game.underBoardUIElements.scraps.elements.scrapsX.state = 0;
+  }
   if (bIsMobileFullscreen && divHeight > divWidth) {
     bButtonWasClicked = game.checkButtons(mouseY, height - mouseX);
   } else {

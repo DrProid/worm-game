@@ -20,6 +20,8 @@ class StateManager {
     makeDesktop(this);
     makeWelcomeUI(this);
     makeTaskBar(this);
+    makeScraps(this);
+    // this.underBoardUIElements.scraps.setVisible(true);
 
     makeGameWindow(this);
 
@@ -116,6 +118,8 @@ class StateManager {
         this.underBoardUIElements.tutorial.setVisible(true);
         this.underBoardUIElements.tutorial.setInteractable(true);
         this.underBoardUIElements.desktop.setInteractable(false);
+        this.underBoardUIElements.scraps.setVisible(false);
+        this.underBoardUIElements.scraps.setInteractable(false);
         this.removeWormFact();
         break;
       case 'ready':
@@ -128,6 +132,8 @@ class StateManager {
         this.board.setVisible(false);
         this.underBoardUIElements.lives.setVisible(false);
         this.underBoardUIElements.score.setVisible(false);
+        this.underBoardUIElements.scraps.setVisible(false);
+        this.underBoardUIElements.scraps.setInteractable(false);
         break;
       case 'play':
         this.overBoardUIElements.gameOver.setVisible(false);
@@ -161,6 +167,10 @@ class StateManager {
         this.overBoardUIElements.gameOver.setVisible(true);
         this.overBoardUIElements.gameOver.setInteractable(true);
         // gameStartSound();
+        break;
+      case 'scraps':
+        this.underBoardUIElements.scraps.setVisible(true);
+        this.underBoardUIElements.scraps.setInteractable(true);
         break;
       default:
         console.error("unknown state sent to changeState : " + state);
