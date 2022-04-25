@@ -36,6 +36,8 @@ class StateManager {
 
     this.changeState('ready');
 
+
+
   }
   makeWormFact() {
     makeWormFact(this);
@@ -184,7 +186,15 @@ class StateManager {
     for (let key in this.underBoardUIElements) {
       this.underBoardUIElements[key].draw();
     }
-
+    push();
+    if (this.redFlash > 0) {
+      this.redFlash--;
+    } else {
+      this.redFlash = 0;
+    }
+    fill(255, 0, 0, this.redFlash);
+    rect(0, 0, width, height);
+    pop();
     if (this.state == 'play' || this.state == 'pause') {
       this.board.draw();
     }
@@ -224,6 +234,7 @@ class StateManager {
     } else if (change.foodChange < 0) {
       badSound();
       this.life--;
+      this.redFlash = 100;
       if (this.life <= 0) {
         this.changeState('gameOver');
       }

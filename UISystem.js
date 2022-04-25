@@ -552,13 +552,13 @@ function makeScraps(parent) {
     anchor.yOffPct = 0.5;
     anchor.horz = CENTER;
     anchor.vert = CENTER;
-    anchor.heightPct = 0.9;
-    anchor.widthRatio = 0.5;
+    anchor.heightPct = 0.6;
+    anchor.widthRatio = 1;
     // anchor.heightRatio = imageList.facts[0].height / imageList.facts[0].width;
     parent.addUI("scraps", fullScreenPos(), fullScreenDim(), { ...anchor }, undefined, false);
 
     anchor.xOffPct = 0.98;
-    anchor.yOffPct = 0.01;
+    anchor.yOffPct = 0.02;
     anchor.vert = TOP;
     anchor.horz = RIGHT;
     anchor.widthPct = 0.05;
@@ -577,44 +577,44 @@ function makeScraps(parent) {
     anchor.vert = CENTER;
     anchor.xOffPct = 0.5;
     anchor.widthPct = 0;
-    anchor.heightPct = 0.02;
-    anchor.yOffPct = 0.055;
+    anchor.heightPct = 0.03;
+    anchor.yOffPct = 0.52;
     parent.underBoardUIElements.scraps.addTextElement("speed hint", { ...anchor }, undefined, `Keep ${(isMobile ? 'swiping' : 'tapping')} for more speed!`);
 
     anchor.xOffPct = 0.5;
     anchor.widthPct = 0.9;
-    anchor.heightPct = 0.2;
-    anchor.yOffPct = 0.22;
+    anchor.heightPct = 0.35;
+    anchor.yOffPct = 0.3;
     parent.underBoardUIElements.scraps.addBoxElement("goodBox", { ...anchor }, color('#4ef451'));
-    anchor.yOffPct = 0.484;
-    parent.underBoardUIElements.scraps.addBoxElement("badBox", { ...anchor }, color('#bc5640'));
     anchor.yOffPct = 0.75;
-    parent.underBoardUIElements.scraps.addBoxElement("nameBox", { ...anchor }, color('#8fefef'));
+    parent.underBoardUIElements.scraps.addBoxElement("badBox", { ...anchor }, color('#bc5640'));
+    // anchor.yOffPct = 0.75;
+    // parent.underBoardUIElements.scraps.addBoxElement("nameBox", { ...anchor }, color('#8fefef'));
 
     anchor.widthPct = 0;
     anchor.heightPct = 0.03;
-    anchor.yOffPct = 0.145;
+    anchor.yOffPct = 0.15;
     parent.underBoardUIElements.scraps.addTextElement("goodTitle", { ...anchor }, undefined, "GOOD FOOD FOR WORMS");
-    anchor.yOffPct = 0.409;
+    anchor.yOffPct = 0.6;
     parent.underBoardUIElements.scraps.addTextElement("badTitle", { ...anchor }, undefined, "BAD FOOD FOR WORMS");
 
 
-    anchor.widthPct = 0;
-    anchor.heightPct = 0.02;
-    anchor.xOffPct = 0.5;
-    anchor.yOffPct = 0.7;
-    parent.underBoardUIElements.scraps.addTextElement("Inge", { ...anchor }, undefined, "Art - Inge Berman");
-    anchor.yOffPct += 0.05;
-    parent.underBoardUIElements.scraps.addTextElement("Joel", { ...anchor }, undefined, "Code - Joel Flanagan");
-    anchor.yOffPct += 0.05;
-    parent.underBoardUIElements.scraps.addTextElement("Leo", { ...anchor }, undefined, "Audio - Leonardo Sunshine");
+    // anchor.widthPct = 0;
+    // anchor.heightPct = 0.02;
+    // anchor.xOffPct = 0.5;
+    // anchor.yOffPct = 0.7;
+    // parent.underBoardUIElements.scraps.addTextElement("Inge", { ...anchor }, undefined, "Art - Inge Berman");
+    // anchor.yOffPct += 0.05;
+    // parent.underBoardUIElements.scraps.addTextElement("Joel", { ...anchor }, undefined, "Code - Joel Flanagan");
+    // anchor.yOffPct += 0.05;
+    // parent.underBoardUIElements.scraps.addTextElement("Leo", { ...anchor }, undefined, "Audio - Leonardo Sunshine");
     anchor.heightPct = 0.03;
     anchor.yOffPct = 0.9;
-    parent.underBoardUIElements.scraps.addTextElement("credits", { ...anchor }, undefined, "Thanks for playing!");
+    // parent.underBoardUIElements.scraps.addTextElement("credits", { ...anchor }, undefined, "Thanks for playing!");
 
     anchor.heightPct = 0.1;
     anchor.widthRatio = 1.5;
-    anchor.yOffPct = 0.97;
+    anchor.yOffPct = 0.965;
     anchor.xOffPct = 3 / 8;
     parent.underBoardUIElements.scraps.addTextElement("love0", { ...anchor }, imageList.life, "");
     anchor.xOffPct = 5 / 8;
@@ -626,11 +626,11 @@ function makeScraps(parent) {
 
 
 
-    anchor.heightPct = 0.05;
+    anchor.heightPct = 0.09;
     anchor.widthRatio = 1;
     for (let i in imageList.good) {
         let row = floor(i / 5);
-        anchor.yOffPct = row * 0.075 + 0.2;
+        anchor.yOffPct = row * 0.125 + 0.25;
 
         anchor.xOffPct = map(i % 5, 0, 4, 0.2, 0.8);
         parent.underBoardUIElements.scraps.addTextElement("good" + i, { ...anchor }, imageList.good[i], "");
@@ -638,7 +638,7 @@ function makeScraps(parent) {
 
     for (let i in imageList.bad) {
         let row = floor(i / 4);
-        anchor.yOffPct = row * 0.075 + 0.464;
+        anchor.yOffPct = row * 0.125 + 0.7;
         anchor.xOffPct = map(i % 4, 0, 3, 0.2, 0.8);
         parent.underBoardUIElements.scraps.addTextElement("bad" + i, { ...anchor }, imageList.bad[i], "");
     }
