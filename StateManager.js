@@ -19,9 +19,9 @@ class StateManager {
     this.underBoardUIElements = {};
     makeDesktop(this);
     makeWelcomeUI(this);
-    makeTaskBar(this);
     makeScraps(this);
     makeCredits(this);
+    makeTaskBar(this);
     // this.underBoardUIElements.scraps.setVisible(true);
 
     makeGameWindow(this);
@@ -190,19 +190,31 @@ class StateManager {
   }
 
   draw() {
+
+    
     //draw all of the UI that apears under game board
     for (let key in this.underBoardUIElements) {
       this.underBoardUIElements[key].draw();
+      if(key == 'desktop'){
+        push();
+        if (this.redFlash > 0) {
+          this.redFlash-=2;
+        } else {
+          this.redFlash = 0;
+        }
+        fill(255, 0, 0, this.redFlash);
+        rect(0, 0, width, height);
+        if (this.greenFlash > 0) {
+          this.greenFlash-=2;
+        } else {
+          this.greenFlash = 0;
+        }
+        fill(0, 255, 0, this.greenFlash);
+        rect(0, 0, width, height);
+        pop();
+      }
     }
-    push();
-    if (this.redFlash > 0) {
-      this.redFlash--;
-    } else {
-      this.redFlash = 0;
-    }
-    fill(255, 0, 0, this.redFlash);
-    rect(0, 0, width, height);
-    pop();
+    
     if (this.state == 'play' || this.state == 'pause') {
       this.board.draw();
     }
@@ -225,6 +237,7 @@ class StateManager {
     }
 
     if (change.foodChange > 0) {
+      this.greenFlash = 200;
       goodSound();
       this.goodFoodsEaten += change.foodChange;//count the food to track level changes
       //speed/slow up game, increase/decrease max food
@@ -242,7 +255,7 @@ class StateManager {
     } else if (change.foodChange < 0) {
       badSound();
       this.life--;
-      this.redFlash = 100;
+      this.redFlash = 200;
       if (this.life <= 0) {
         this.changeState('gameOver');
       }
