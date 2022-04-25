@@ -598,8 +598,16 @@ function makeScraps(parent) {
 
     anchor.heightPct = 0.1;
     anchor.widthRatio = 1.5;
-    anchor.yOffPct = 0.95;
-    parent.underBoardUIElements.scraps.addTextElement("love", { ...anchor }, imageList.life, "");
+    anchor.yOffPct = 0.97;
+    anchor.xOffPct = 3/8;
+    parent.underBoardUIElements.scraps.addTextElement("love0", { ...anchor }, imageList.life, "");
+    anchor.xOffPct = 5/8;
+    parent.underBoardUIElements.scraps.addTextElement("love1", { ...anchor }, imageList.life, "");
+    anchor.heightPct = 0.05;
+    anchor.widthRatio = 1;
+    anchor.xOffPct = 0.5;
+    parent.underBoardUIElements.scraps.addTextElement("loveworm", { ...anchor }, imageList.wormDance, "");
+
 
 
     anchor.heightPct = 0.05;

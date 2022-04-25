@@ -26,6 +26,8 @@ function preload() {
   //font
   retroFont = loadFont('./assets/images/fonts/Retro Gaming.ttf');
 
+  imageList.wormDance = loadImage('./assets/images/wormdance_02.gif');
+
   //welcome
   if (isMobile) {
     imageList.tutorial = loadImage('./assets/images/UI_Window_Wormgame_Tutorial_Tablet.png');
