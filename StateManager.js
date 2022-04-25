@@ -171,6 +171,7 @@ class StateManager {
       case 'scraps':
         this.underBoardUIElements.scraps.setVisible(true);
         this.underBoardUIElements.scraps.setInteractable(true);
+        this.removeWormFact();
         break;
       default:
         console.error("unknown state sent to changeState : " + state);

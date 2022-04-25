@@ -373,7 +373,7 @@ function makeGameOver(parent) {
     parent.addUI("gameOver", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.gameOverWindow);
 
     anchor.heightPct = 0.2;
-    anchor.widthPct = 0.8;
+    anchor.widthPct = 0;
     anchor.yOffPct = 0.45;
     anchor.heightRatio = undefined;
     parent.overBoardUIElements.gameOver.addTextElement("score", { ...anchor }, undefined, "game.score");
@@ -529,7 +529,8 @@ function makeTaskBar(parent) {
     anchor.widthRatio = imageList.scoreWindow.width / imageList.scoreWindow.height;
     parent.addUI("score", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.scoreWindow, false);
 
-    anchor.xOffPct = 0.625;
+    anchor.xOffPct = 0.5;
+    anchor.widthPct = 0;
     anchor.yOffPct = 0.5;
     anchor.heightPct = 0.3;
     anchor.widthRatio = undefined;
@@ -567,7 +568,8 @@ function makeScraps(parent) {
     anchor.heightRatio = undefined;
     anchor.horz = CENTER;
     anchor.vert = CENTER;
-    anchor.xOffPct = 0.525;
+    anchor.xOffPct = 0.5;
+    anchor.widthPct = 0;
     anchor.heightPct = 0.03;
     anchor.yOffPct = 0.125;
     parent.underBoardUIElements.scraps.addTextElement("goodTitle", { ...anchor }, undefined, "Good Foods for Worms");
@@ -581,7 +583,7 @@ function makeScraps(parent) {
     anchor.yOffPct = 0.55;
     parent.underBoardUIElements.scraps.addBoxElement("badBox", { ...anchor }, color('#bc5640'));
     
-    anchor.widthPct = 0.001;
+    anchor.widthPct = 0;
     anchor.heightPct = 0.02;
     anchor.xOffPct = 0.5;
     anchor.yOffPct = 0.7;
@@ -589,7 +591,7 @@ function makeScraps(parent) {
     anchor.yOffPct = 0.75;
     parent.underBoardUIElements.scraps.addTextElement("Joel", { ...anchor }, undefined, "Code - Joel Flanagan");
     anchor.yOffPct = 0.8;
-    parent.underBoardUIElements.scraps.addTextElement("Leo", { ...anchor }, undefined, "Audio - Leo Sunshine");
+    parent.underBoardUIElements.scraps.addTextElement("Leo", { ...anchor }, undefined, "Audio - Leonardo Sunshine");
     anchor.heightPct = 0.03;
     anchor.yOffPct = 0.9;
     parent.underBoardUIElements.scraps.addTextElement("credits", { ...anchor }, undefined, "Thanks for playing!");
