@@ -200,9 +200,12 @@ class BoxElement extends UI {
     draw() {
         super.draw();
         push();
-        colorMode(HSB, 255);
-        let col = color(hue(this.colour), 200, brightness(this.colour) * 0.8);
+        const threeColour = new THREE.Color(`rgb(${red(this.colour)}, ${green(this.colour)}, ${blue(this.colour)})`);
+        threeColour.getHSL(threeColour);
 
+        colorMode(HSL, 255);
+
+        let col = color(threeColour.h * 255, threeColour.s * 200, threeColour.l * 220);
         noStroke();
         let edgeWidth = this.dim.width * 0.01;
         fill(col);
@@ -214,7 +217,8 @@ class BoxElement extends UI {
         vertex(this.pos.xOff + this.dim.width - edgeWidth, this.pos.yOff + this.dim.height - edgeWidth);
         endShape();
 
-        col = color(hue(this.colour), 200, brightness(this.colour) * 0.5);
+        // col = color(hue(this.colour), saturation(this.colour), brightness(this.colour) );
+        col = color(threeColour.h * 255, threeColour.s * 200, threeColour.l * 150);
         fill(col);
         beginShape();
         vertex(this.pos.xOff + edgeWidth, this.pos.yOff + edgeWidth);
@@ -540,6 +544,9 @@ function makeTaskBar(parent) {
 }
 
 function makeScraps(parent) {
+
+
+
     let anchor = defaultAnchor();
     anchor.xOffPct = 0.5;
     anchor.yOffPct = 0.5;
@@ -570,27 +577,36 @@ function makeScraps(parent) {
     anchor.vert = CENTER;
     anchor.xOffPct = 0.5;
     anchor.widthPct = 0;
-    anchor.heightPct = 0.03;
-    anchor.yOffPct = 0.125;
-    parent.underBoardUIElements.scraps.addTextElement("goodTitle", { ...anchor }, undefined, "Good Foods for Worms");
-    anchor.yOffPct = 0.425;
-    parent.underBoardUIElements.scraps.addTextElement("badTitle", { ...anchor }, undefined, "Bad Foods for Worms");
+    anchor.heightPct = 0.02;
+    anchor.yOffPct = 0.055;
+    parent.underBoardUIElements.scraps.addTextElement("speed hint", { ...anchor }, undefined, `Keep ${(isMobile ? 'swiping' : 'tapping')} for more speed!`);
+
     anchor.xOffPct = 0.5;
-    anchor.yOffPct = 0.25;
     anchor.widthPct = 0.9;
     anchor.heightPct = 0.2;
+    anchor.yOffPct = 0.22;
     parent.underBoardUIElements.scraps.addBoxElement("goodBox", { ...anchor }, color('#4ef451'));
-    anchor.yOffPct = 0.55;
+    anchor.yOffPct = 0.484;
     parent.underBoardUIElements.scraps.addBoxElement("badBox", { ...anchor }, color('#bc5640'));
+    anchor.yOffPct = 0.75;
+    parent.underBoardUIElements.scraps.addBoxElement("nameBox", { ...anchor }, color('#8fefef'));
+
+    anchor.widthPct = 0;
+    anchor.heightPct = 0.03;
+    anchor.yOffPct = 0.145;
+    parent.underBoardUIElements.scraps.addTextElement("goodTitle", { ...anchor }, undefined, "GOOD FOOD FOR WORMS");
+    anchor.yOffPct = 0.409;
+    parent.underBoardUIElements.scraps.addTextElement("badTitle", { ...anchor }, undefined, "BAD FOOD FOR WORMS");
+
 
     anchor.widthPct = 0;
     anchor.heightPct = 0.02;
     anchor.xOffPct = 0.5;
     anchor.yOffPct = 0.7;
     parent.underBoardUIElements.scraps.addTextElement("Inge", { ...anchor }, undefined, "Art - Inge Berman");
-    anchor.yOffPct = 0.75;
+    anchor.yOffPct += 0.05;
     parent.underBoardUIElements.scraps.addTextElement("Joel", { ...anchor }, undefined, "Code - Joel Flanagan");
-    anchor.yOffPct = 0.8;
+    anchor.yOffPct += 0.05;
     parent.underBoardUIElements.scraps.addTextElement("Leo", { ...anchor }, undefined, "Audio - Leonardo Sunshine");
     anchor.heightPct = 0.03;
     anchor.yOffPct = 0.9;
@@ -614,7 +630,7 @@ function makeScraps(parent) {
     anchor.widthRatio = 1;
     for (let i in imageList.good) {
         let row = floor(i / 5);
-        anchor.yOffPct = row * 0.1 + 0.2;
+        anchor.yOffPct = row * 0.075 + 0.2;
 
         anchor.xOffPct = map(i % 5, 0, 4, 0.2, 0.8);
         parent.underBoardUIElements.scraps.addTextElement("good" + i, { ...anchor }, imageList.good[i], "");
@@ -622,7 +638,7 @@ function makeScraps(parent) {
 
     for (let i in imageList.bad) {
         let row = floor(i / 4);
-        anchor.yOffPct = row * 0.1 + 0.5;
+        anchor.yOffPct = row * 0.075 + 0.464;
         anchor.xOffPct = map(i % 4, 0, 3, 0.2, 0.8);
         parent.underBoardUIElements.scraps.addTextElement("bad" + i, { ...anchor }, imageList.bad[i], "");
     }
