@@ -47,7 +47,9 @@ function preload() {
   imageList.wormGameClick = loadImage('./assets/images/UI_Icon_wormgame_click.png');
   imageList.appleIdle = loadImage('./assets/images/UI_Icon_apple_idle.png');
   imageList.appleClick = loadImage('./assets/images/UI_Icon_apple_click.png');
-
+  imageList.notepadIdle = loadImage('./assets/images/UI_Icon_Notepad_Idle.png');
+  imageList.notepadClick = loadImage('./assets/images/UI_Icon_Notepad_Click.png');
+  
   //taskbar
   imageList.livesWindow = loadImage('./assets/images/UI_Window_Lives.png');
   imageList.life = loadImage('./assets/images/UI_Hearts.gif');
@@ -251,7 +253,7 @@ function checkButtonHold(xPos, yPos) {
 function swipeControlEnd() {
 
   let bButtonWasClicked = false;
-  if (game.state == "scraps") {
+  if (game.state == "scraps" || game.state == 'credits') {
     //override of scraps to go away on a click anywhere
     game.changeState('ready');
     game.underBoardUIElements.scraps.elements.scrapsX.state = 0;

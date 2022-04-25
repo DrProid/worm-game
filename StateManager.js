@@ -21,6 +21,7 @@ class StateManager {
     makeWelcomeUI(this);
     makeTaskBar(this);
     makeScraps(this);
+    makeCredits(this);
     // this.underBoardUIElements.scraps.setVisible(true);
 
     makeGameWindow(this);
@@ -136,6 +137,8 @@ class StateManager {
         this.underBoardUIElements.score.setVisible(false);
         this.underBoardUIElements.scraps.setVisible(false);
         this.underBoardUIElements.scraps.setInteractable(false);
+        this.underBoardUIElements.credits.setVisible(false);
+        this.underBoardUIElements.credits.setInteractable(false);
         break;
       case 'play':
         this.overBoardUIElements.gameOver.setVisible(false);
@@ -173,6 +176,11 @@ class StateManager {
       case 'scraps':
         this.underBoardUIElements.scraps.setVisible(true);
         this.underBoardUIElements.scraps.setInteractable(true);
+        this.removeWormFact();
+        break;
+      case 'credits':
+        this.underBoardUIElements.credits.setVisible(true);
+        this.underBoardUIElements.credits.setInteractable(true);
         this.removeWormFact();
         break;
       default:

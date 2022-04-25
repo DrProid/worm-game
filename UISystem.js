@@ -149,8 +149,16 @@ class UIContainer extends UI {
             vertex(this.pos.xOff + this.dim.width - edgeWidth, this.pos.yOff + this.dim.height - edgeWidth);
             endShape();
 
-            fill('grey');
+            fill('#c1bfcc');
             rect(this.pos.xOff + edgeWidth, this.pos.yOff + edgeWidth, this.dim.width - edgeWidth * 2, this.dim.height - edgeWidth * 2);
+
+
+            edgeWidth *= 1.2;
+            let gradient = drawingContext.createLinearGradient(0, 0, this.dim.width, 0);
+            gradient.addColorStop(0, '#2300D2');
+            gradient.addColorStop(1, '#07004B');
+            drawingContext.fillStyle = gradient;
+            rect(this.pos.xOff + edgeWidth, this.pos.yOff + edgeWidth, this.dim.width - edgeWidth * 2, this.dim.height * 0.07);
 
             pop();
         }
@@ -436,6 +444,16 @@ function makeDesktop(parent) {
         boopSound();
     });
 
+    btnAnchor.horz = RIGHT;
+    btnAnchor.xOffPct = 0.95;
+    btnAnchor.yOffPct = 0.05;
+    parent.underBoardUIElements.desktop.addButtonElement("credits", { ...btnAnchor }, [imageList.notepadIdle, imageList.notepadClick], "", () => {
+        console.log("credits pressed");
+        // parent.makeWormFact();
+        parent.changeState('credits');
+        boopSound();
+    });
+
     parent.underBoardUIElements.desktop.setVisible(true);
 }
 
@@ -543,9 +561,51 @@ function makeTaskBar(parent) {
     parent.underBoardUIElements.score.addTextElement("score", { ...anchor }, undefined, "score");
 }
 
+function makeCredits(parent) {
+    let anchor = defaultAnchor();
+    anchor.xOffPct = 0.5;
+    anchor.yOffPct = 0.5;
+    anchor.horz = CENTER;
+    anchor.vert = CENTER;
+    anchor.heightPct = 0.6;
+    anchor.widthRatio = 1;
+    parent.addUI("credits", fullScreenPos(), fullScreenDim(), { ...anchor }, undefined, false);
+
+    anchor.xOffPct = 0.98;
+    anchor.yOffPct = 0.0225;
+    anchor.vert = TOP;
+    anchor.horz = RIGHT;
+    anchor.widthPct = 0.05;
+    anchor.heightRatio = 1;
+    anchor.widthRatio = undefined;
+    parent.underBoardUIElements.credits.addButtonElement("creditsX", { ...anchor }, [imageList.factXIdle, imageList.factXClick], "X", () => {
+        boopSound();
+        parent.changeState('ready');
+    });
+
+    anchor.xOffPct = 0.5;
+    anchor.yOffPct = 0.2;
+    anchor.widthPct = 0;
+    anchor.heightPct = 0.03;
+    anchor.heightRatio = undefined;
+    parent.underBoardUIElements.credits.addTextElement("credits1", { ...anchor }, undefined, "Wormfarm was created for the Cool River City\n project launched by Pari Artist Run Initiative.");
+    
+    anchor.heightPct = 0.045;
+    anchor.yOffPct = 0.35;
+    parent.underBoardUIElements.credits.addTextElement("credits2", { ...anchor }, undefined, "Produced by Hayley Coghlan");
+    anchor.yOffPct += 0.15;
+    parent.underBoardUIElements.credits.addTextElement("credits3", { ...anchor }, undefined, "Art by ingechu");
+    anchor.yOffPct += 0.15;
+    // anchor.yOffPct = 0.5;
+    parent.underBoardUIElements.credits.addTextElement("credits4", { ...anchor }, undefined, "Programming by Joel Flanagan");
+    anchor.yOffPct += 0.15;
+    // anchor.yOffPct = 0.6;
+    parent.underBoardUIElements.credits.addTextElement("credits5", { ...anchor }, undefined, "Sound by Leonardo Sunshine");
+    //  Produced by Hayley Coghlan Art by ingechu Programming by Joel Flanagan Sound by Leonardo Sunshine");
+
+}
+
 function makeScraps(parent) {
-
-
 
     let anchor = defaultAnchor();
     anchor.xOffPct = 0.5;
@@ -554,19 +614,16 @@ function makeScraps(parent) {
     anchor.vert = CENTER;
     anchor.heightPct = 0.6;
     anchor.widthRatio = 1;
-    // anchor.heightRatio = imageList.facts[0].height / imageList.facts[0].width;
     parent.addUI("scraps", fullScreenPos(), fullScreenDim(), { ...anchor }, undefined, false);
 
     anchor.xOffPct = 0.98;
-    anchor.yOffPct = 0.02;
+    anchor.yOffPct = 0.0225;
     anchor.vert = TOP;
     anchor.horz = RIGHT;
     anchor.widthPct = 0.05;
     anchor.heightRatio = 1;
     anchor.widthRatio = undefined;
     parent.underBoardUIElements.scraps.addButtonElement("scrapsX", { ...anchor }, [imageList.factXIdle, imageList.factXClick], "X", () => {
-        // console.log("close fact");
-        // parent.removeWormFact();
         boopSound();
         parent.changeState('ready');
     });
@@ -585,11 +642,9 @@ function makeScraps(parent) {
     anchor.widthPct = 0.9;
     anchor.heightPct = 0.35;
     anchor.yOffPct = 0.3;
-    parent.underBoardUIElements.scraps.addBoxElement("goodBox", { ...anchor }, color('#4ef451'));
+    parent.underBoardUIElements.scraps.addBoxElement("goodBox", { ...anchor }, color('#79EA89'));
     anchor.yOffPct = 0.75;
-    parent.underBoardUIElements.scraps.addBoxElement("badBox", { ...anchor }, color('#bc5640'));
-    // anchor.yOffPct = 0.75;
-    // parent.underBoardUIElements.scraps.addBoxElement("nameBox", { ...anchor }, color('#8fefef'));
+    parent.underBoardUIElements.scraps.addBoxElement("badBox", { ...anchor }, color('#E85C5C'));
 
     anchor.widthPct = 0;
     anchor.heightPct = 0.03;
@@ -597,20 +652,6 @@ function makeScraps(parent) {
     parent.underBoardUIElements.scraps.addTextElement("goodTitle", { ...anchor }, undefined, "GOOD FOOD FOR WORMS");
     anchor.yOffPct = 0.6;
     parent.underBoardUIElements.scraps.addTextElement("badTitle", { ...anchor }, undefined, "BAD FOOD FOR WORMS");
-
-
-    // anchor.widthPct = 0;
-    // anchor.heightPct = 0.02;
-    // anchor.xOffPct = 0.5;
-    // anchor.yOffPct = 0.7;
-    // parent.underBoardUIElements.scraps.addTextElement("Inge", { ...anchor }, undefined, "Art - Inge Berman");
-    // anchor.yOffPct += 0.05;
-    // parent.underBoardUIElements.scraps.addTextElement("Joel", { ...anchor }, undefined, "Code - Joel Flanagan");
-    // anchor.yOffPct += 0.05;
-    // parent.underBoardUIElements.scraps.addTextElement("Leo", { ...anchor }, undefined, "Audio - Leonardo Sunshine");
-    anchor.heightPct = 0.03;
-    anchor.yOffPct = 0.9;
-    // parent.underBoardUIElements.scraps.addTextElement("credits", { ...anchor }, undefined, "Thanks for playing!");
 
     anchor.heightPct = 0.1;
     anchor.widthRatio = 1.5;
@@ -623,8 +664,6 @@ function makeScraps(parent) {
     anchor.widthRatio = 1;
     anchor.xOffPct = 0.5;
     parent.underBoardUIElements.scraps.addTextElement("loveworm", { ...anchor }, imageList.wormDance, "");
-
-
 
     anchor.heightPct = 0.09;
     anchor.widthRatio = 1;
