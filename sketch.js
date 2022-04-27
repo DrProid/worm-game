@@ -11,7 +11,7 @@ let mouseDown;
 let lastMobileTap = { x: 0, y: 0, time: 0 };
 
 let bIsDebugMode = false;
-let version = "v0.201";
+let version = "v0.202";
 
 let suppressPauseTimer = 0;
 
@@ -183,7 +183,7 @@ function windowResized() {
   }
 
   //mobile fullscreen is different
-  if (bIsMobileFullscreen && divHeight > divWidth) {
+  if (isMobile && fullscreen() && divHeight > divWidth) {
     resizeCanvas(divHeight, divWidth);
     cnv.elt.style.transform = 'translate(-50%,-50%) rotate(90deg)';
   } else {
@@ -247,25 +247,27 @@ function mouseReleased() {
 
 function swipeControlStart() {
   mouseDown = createVector(mouseX, mouseY);//store the position of the mouse when it is pressed
-
+  if (game.state == 'mobileWelcome') {
+    game.changeState('ready');
+  }
   if (isMobile && (lastMobileTap.x != mouseX && lastMobileTap.y != mouseY && lastMobileTap.time <= millis() - 100)) {
     //check for the stupid p5 double tap bug on mobile.
     lastMobileTap.x = mouseX;
     lastMobileTap.y = mouseY;
     lastMobileTap.time = millis();
-    if (bIsMobileFullscreen && divHeight > divWidth) {
+    if (isMobile && fullscreen() && divHeight > divWidth) {
       bButtonWasClicked = game.checkButtons(mouseY, height - mouseX);
     } else {
       bButtonWasClicked = game.checkButtons(mouseX, mouseY);
     }
     mouseSound();
-  } else if(!isMobile){
+  } else if (!isMobile) {
     mouseSound();
   }
 }
 
 function checkButtonHold(xPos, yPos) {
-  if (bIsMobileFullscreen && divHeight > divWidth) {
+  if (isMobile && fullscreen() && divHeight > divWidth) {
     game.checkButtons(yPos, height - xPos, HOLD);
   } else {
     game.checkButtons(xPos, yPos, HOLD);
@@ -276,12 +278,8 @@ function swipeControlEnd() {
 
   let bButtonWasClicked = false;
 
-  if(!isMobile){
-    if (bIsMobileFullscreen && divHeight > divWidth) {
-      bButtonWasClicked = game.checkButtons(mouseY, height - mouseX);
-    } else {
-      bButtonWasClicked = game.checkButtons(mouseX, mouseY);
-    }
+  if (!isMobile) {
+    bButtonWasClicked = game.checkButtons(mouseX, mouseY);
   }
 
   if (isMobile && !bButtonWasClicked && game.state == 'play' && mouseDown != undefined) {

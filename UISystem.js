@@ -48,15 +48,15 @@ class UI {
         //only one ratio can be used, width takes priority if both are set (don't set both)
         if (this.anchor.widthRatio != undefined) {
             this.dim.width = this.anchor.widthRatio * this.dim.height;
-            if(this.dim.width > parentDim.width * this.anchor.widthPct){
+            if (this.dim.width > parentDim.width * this.anchor.widthPct) {
                 this.dim.width = parentDim.width * this.anchor.widthPct;
-                this.dim.height = (1/this.anchor.widthRatio) * this.dim.width;
+                this.dim.height = (1 / this.anchor.widthRatio) * this.dim.width;
             }
         } else if (this.anchor.heightRatio != undefined) {
             this.dim.height = this.anchor.heightRatio * this.dim.width;
-            if(this.dim.height > parentDim.height * this.anchor.heightPct){
+            if (this.dim.height > parentDim.height * this.anchor.heightPct) {
                 this.dim.height = parentDim.height * this.anchor.heightPct;
-                this.dim.width = (1/this.anchor.heightRatio) * this.dim.height;
+                this.dim.width = (1 / this.anchor.heightRatio) * this.dim.height;
             }
         }
 
@@ -189,7 +189,7 @@ class UIContainer extends UI {
         }
         return result;
     }
-    normalButtons(){
+    normalButtons() {
         for (let name in this.elements) {
             if (this.elements[name] instanceof ButtonElement) {
                 this.elements[name].state = 0;
@@ -381,7 +381,7 @@ function makePauseUI(parent) {
     anchor.heightPct = 0.3;
     anchor.heightRatio = imageList.pauseWindow.height / imageList.pauseWindow.width;
     parent.addUI("pause", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.pauseWindow);
-    
+
     anchor.vert = BOTTOM;
     anchor.widthPct = 0.5;
     anchor.heightPct = 0.5;
@@ -421,8 +421,6 @@ function makeGameOver(parent) {
     });
 }
 
-let bIsMobileFullscreen = false;
-
 function makeDesktop(parent) {
     let anchor = defaultAnchor();
     anchor.xOffPct = 0;
@@ -449,13 +447,12 @@ function makeDesktop(parent) {
     btnAnchor.yOffPct = 0.35;
     parent.underBoardUIElements.desktop.addButtonElement("startGame", { ...btnAnchor }, [imageList.wormGameIdle, imageList.wormGameClick], "", () => {
         // console.log("start pressed");
-        if (isMobile) {
-            bIsMobileFullscreen = true;
-            fullscreen(true);
-        }
         // parent.startGame();
         parent.changeState('tutorial');
         boopSound();
+        if (isMobile && !fullscreen()) {
+            fullscreen(true);
+        }
     });
 
     btnAnchor.yOffPct = 0.6;
@@ -499,15 +496,9 @@ function makeGameWindow(parent) {
     btnAnchor.xOffPct = 0.95;
     parent.board.addButtonElement("fullscreen", { ...btnAnchor }, [imageList.gameWindowFullscreenIdle, imageList.gameWindowFullscreenClick], "", () => {
         // console.log("fullscreen clicked"); 
-        if (isMobile) {
-            bIsMobileFullscreen = !bIsMobileFullscreen;
-            suppressPauseTimer = millis() + 100;
-            fullscreen(bIsMobileFullscreen);
-        } else {
-            let fs = fullscreen();
-            suppressPauseTimer = millis() + 100;
-            fullscreen(!fs);
-        }
+        let fs = fullscreen();
+        suppressPauseTimer = millis() + 100;
+        fullscreen(!fs);
         boopSound();
     });
 
@@ -613,7 +604,7 @@ function makeCredits(parent) {
     // anchor.heightPct = 0.03;
     // anchor.heightRatio = undefined;
     // parent.underBoardUIElements.credits.addTextElement("credits1", { ...anchor }, undefined, "Wormfarm was created for the Cool River City\n project launched by Pari Artist Run Initiative.");
-    
+
     // anchor.heightPct = 0.045;
     // anchor.yOffPct = 0.35;
     // parent.underBoardUIElements.credits.addTextElement("credits2", { ...anchor }, undefined, "Produced by Hayley Coghlan");
@@ -626,6 +617,42 @@ function makeCredits(parent) {
     // // anchor.yOffPct = 0.6;
     // parent.underBoardUIElements.credits.addTextElement("credits5", { ...anchor }, undefined, "Sound by Leonardo Sunshine");
 
+
+}
+
+function makeMobileWelcome(parent){
+    let anchor = defaultAnchor();
+    anchor.xOffPct = 0.5;
+    anchor.yOffPct = 0.5;
+    anchor.horz = CENTER;
+    anchor.vert = CENTER;
+    anchor.heightPct = 0.25;
+    anchor.widthPct = 0.6;
+    anchor.widthRatio = anchor.widthPct / anchor.heightPct;
+    parent.addUI("mobileWelcome", fullScreenPos(), fullScreenDim(), { ...anchor }, undefined, false);
+
+    anchor.xOffPct = 0.5;
+    anchor.yOffPct = 0.55;
+    anchor.widthPct = 0.8;
+    anchor.heightPct = 0.7;
+    anchor.widthRatio = undefined;
+    parent.underBoardUIElements.mobileWelcome.addBoxElement("goodBox", { ...anchor }, color('#79EA89'));
+    
+    anchor.widthPct = 0;
+    anchor.heightPct = 0.2;
+    parent.underBoardUIElements.mobileWelcome.addTextElement("fullscreen", { ...anchor }, undefined, "Play on mobile");
+
+    // anchor.xOffPct = 0.978;
+    // anchor.yOffPct = 0.029;
+    // anchor.vert = TOP;
+    // anchor.horz = RIGHT;
+    // anchor.widthPct = 0.05;
+    // anchor.heightRatio = 1;
+    // anchor.widthRatio = undefined;
+    // parent.underBoardUIElements.mobileWelcome.addButtonElement("fullscreen", { ...anchor }, undefined, "FULLSCREEN", () => {
+    //     boopSound();
+    //     parent.changeState('ready');
+    // });
 
 }
 

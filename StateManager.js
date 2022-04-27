@@ -18,6 +18,7 @@ class StateManager {
 
     this.underBoardUIElements = {};
     makeDesktop(this);
+    makeMobileWelcome(this);
     makeWelcomeUI(this);
     makeScraps(this);
     makeCredits(this);
@@ -37,8 +38,9 @@ class StateManager {
     this.life = 3;
 
     this.changeState('ready');
-
-
+    if(isMobile){
+      this.changeState('mobileWelcome');
+    }
 
   }
   makeWormFact() {
@@ -149,6 +151,8 @@ class StateManager {
         this.underBoardUIElements.scraps.setInteractable(false);
         this.underBoardUIElements.credits.setVisible(false);
         this.underBoardUIElements.credits.setInteractable(false);
+        this.underBoardUIElements.mobileWelcome.setVisible(false);
+        this.underBoardUIElements.mobileWelcome.setInteractable(false);
         break;
       case 'play':
         this.overBoardUIElements.gameOver.setVisible(false);
@@ -197,6 +201,11 @@ class StateManager {
         this.underBoardUIElements.credits.setVisible(true);
         this.underBoardUIElements.credits.setInteractable(true);
         this.removeWormFact();
+        break;
+      case 'mobileWelcome':
+        this.underBoardUIElements.desktop.setInteractable(false);
+        this.underBoardUIElements.mobileWelcome.setVisible(true);
+        this.underBoardUIElements.mobileWelcome.setInteractable(true);
         break;
       default:
         console.error("unknown state sent to changeState : " + state);

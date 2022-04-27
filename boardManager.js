@@ -174,10 +174,10 @@ class BoardElement {
                 } else if (collideData.foodChange < 0) {
                     this.worm.headOverride = imageList.wormHeadBad;
                 }
-            } else {
-                if (this.foods.length < this.maxFood /*&& random() < 0.05*/) {
-                    this.spawnFood();
-                }
+                // } else {
+            }
+            if (this.foods.length < this.maxFood /*&& random() < 0.05*/) {
+                this.spawnFood();
             }
         }
         //return data for score tracking
@@ -275,7 +275,7 @@ class BoardElement {
         if (this.visible) {
             for (let name in this.elements) {
                 if (this.elements[name] instanceof ButtonElement) {
-                    if( this.elements[name].checkButtons(xPos, yPos, type)){
+                    if (this.elements[name].checkButtons(xPos, yPos, type)) {
                         return true;
                     }
                 }
@@ -283,7 +283,7 @@ class BoardElement {
         }
         return false;
     }
-    normalButtons(){
+    normalButtons() {
         for (let name in this.elements) {
             if (this.elements[name] instanceof ButtonElement) {
                 this.elements[name].state = 0;
@@ -300,7 +300,7 @@ class BoardElement {
             angleMode(RADIANS);//just in case we aren't in radians mode
             let result = map(mouseEnd.heading(), -PI, PI, 0, 4);//convert to 4 cardinal directions
             result = round(result, 0);//round to nearest whole number
-            if (bIsMobileFullscreen && divHeight > divWidth) {
+            if (isMobile && fullscreen() && divHeight > divWidth) {
                 result += 3;
             }
             result %= 4; //4 and 0 are the same direction
