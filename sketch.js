@@ -38,7 +38,7 @@ function preload() {
   imageList.tutorialOkClick = loadImage('./assets/images/UI_Window_Wormgame_Tutorial_Button_OK_Click.png');
   imageList.tutorialXIdle = loadImage('./assets/images/UI_Window_Wormgame_Tutorial_Button_X_Idle.png');
   imageList.tutorialXClick = loadImage('./assets/images/UI_Window_Wormgame_Tutorial_Button_X_Click.png');
-
+  
   //desktop
   imageList.bg = loadImage('./assets/images/UI_BackGround.png');
   imageList.bucketIdle = loadImage('./assets/images/UI_Icon_Bucket_Idle.png');
@@ -50,8 +50,10 @@ function preload() {
   imageList.notepadIdle = loadImage('./assets/images/UI_Icon_Credits_Idle.png');
   imageList.notepadClick = loadImage('./assets/images/UI_Icon_Credits_Click.png');
   
-  //credit
+  //credits
   imageList.creditsWindow = loadImage('./assets/images/UI_Window_Credits.png');
+  imageList.creditsXIdle = loadImage('./assets/images/UI_Window_Credits_Button_X_Idle.png');
+  imageList.creditsXClick = loadImage('./assets/images/UI_Window_Credits_Button_X_Click.png');
   
   //taskbar
   imageList.livesWindow = loadImage('./assets/images/UI_Window_Lives.png');
@@ -221,7 +223,7 @@ function keyPressed() {
       }
       break;
     default:
-      console.log("Some other key pressed. keycode = " + keyCode);
+      // console.log("Some other key pressed. keycode = " + keyCode);
       break;
   }
 }

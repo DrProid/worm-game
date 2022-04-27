@@ -586,7 +586,7 @@ function makeCredits(parent) {
     anchor.widthPct = 0.05;
     anchor.heightRatio = 1;
     anchor.widthRatio = undefined;
-    parent.underBoardUIElements.credits.addButtonElement("creditsX", { ...anchor }, [imageList.factXIdle, imageList.factXClick], "X", () => {
+    parent.underBoardUIElements.credits.addButtonElement("creditsX", { ...anchor }, [imageList.creditsXIdle, imageList.creditsXClick], "X", () => {
         boopSound();
         parent.changeState('ready');
     });
