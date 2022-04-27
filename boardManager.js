@@ -280,6 +280,13 @@ class BoardElement {
             }
         }
     }
+    normalButtons(){
+        for (let name in this.elements) {
+            if (this.elements[name] instanceof ButtonElement) {
+                this.elements[name].state = 0;
+            }
+        }
+    }
     swipeControl(mouseStart, mouseEnd) {
 
         mouseEnd.sub(mouseStart);//result vector is the direction of the swipe

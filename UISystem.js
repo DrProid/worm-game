@@ -174,12 +174,19 @@ class UIContainer extends UI {
             for (let name in this.elements) {
                 if (this.elements[name] instanceof ButtonElement) {
                     if (this.elements[name].checkButtons(xPos, yPos, type)) {
-                        result = true;
+                        return true;
                     }
                 }
             }
         }
         return result;
+    }
+    normalButtons(){
+        for (let name in this.elements) {
+            if (this.elements[name] instanceof ButtonElement) {
+                this.elements[name].state = 0;
+            }
+        }
     }
 }
 
@@ -248,7 +255,7 @@ class ButtonElement extends TextElement {
         super(parentPos, parentDim, anchor, image, text);
         this.callback = callback;
         this.bCanClick = true;
-        this.bCanHold = true;
+        this.bCanHold = false;
         this.state = 0;
 
     }
@@ -269,7 +276,7 @@ class ButtonElement extends TextElement {
         if (this.isOverElement(xPos, yPos)) {
             if (this.image.length >= 2) this.state = 1;
             // console.log("hold " + this.interactable);
-            return this.interactable;
+            return this.bCanHold && this.interactable;
         } else {
             this.state = 0;
         }
@@ -447,8 +454,9 @@ function makeDesktop(parent) {
     btnAnchor.horz = RIGHT;
     btnAnchor.xOffPct = 0.95;
     btnAnchor.yOffPct = 0.05;
+    btnAnchor.widthRatio = 0.75;
     parent.underBoardUIElements.desktop.addButtonElement("credits", { ...btnAnchor }, [imageList.notepadIdle, imageList.notepadClick], "", () => {
-        console.log("credits pressed");
+        // console.log("credits pressed");
         // parent.makeWormFact();
         parent.changeState('credits');
         boopSound();
@@ -567,12 +575,12 @@ function makeCredits(parent) {
     anchor.yOffPct = 0.5;
     anchor.horz = CENTER;
     anchor.vert = CENTER;
-    anchor.heightPct = 0.6;
-    anchor.widthRatio = 1;
-    parent.addUI("credits", fullScreenPos(), fullScreenDim(), { ...anchor }, undefined, false);
+    anchor.widthPct = 0.8;
+    anchor.heightRatio = imageList.creditsWindow.height / imageList.creditsWindow.width;
+    parent.addUI("credits", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.creditsWindow, false);
 
-    anchor.xOffPct = 0.98;
-    anchor.yOffPct = 0.0225;
+    anchor.xOffPct = 0.978;
+    anchor.yOffPct = 0.029;
     anchor.vert = TOP;
     anchor.horz = RIGHT;
     anchor.widthPct = 0.05;
@@ -583,25 +591,25 @@ function makeCredits(parent) {
         parent.changeState('ready');
     });
 
-    anchor.xOffPct = 0.5;
-    anchor.yOffPct = 0.2;
-    anchor.widthPct = 0;
-    anchor.heightPct = 0.03;
-    anchor.heightRatio = undefined;
-    parent.underBoardUIElements.credits.addTextElement("credits1", { ...anchor }, undefined, "Wormfarm was created for the Cool River City\n project launched by Pari Artist Run Initiative.");
+    // anchor.xOffPct = 0.5;
+    // anchor.yOffPct = 0.2;
+    // anchor.widthPct = 0;
+    // anchor.heightPct = 0.03;
+    // anchor.heightRatio = undefined;
+    // parent.underBoardUIElements.credits.addTextElement("credits1", { ...anchor }, undefined, "Wormfarm was created for the Cool River City\n project launched by Pari Artist Run Initiative.");
     
-    anchor.heightPct = 0.045;
-    anchor.yOffPct = 0.35;
-    parent.underBoardUIElements.credits.addTextElement("credits2", { ...anchor }, undefined, "Produced by Hayley Coghlan");
-    anchor.yOffPct += 0.15;
-    parent.underBoardUIElements.credits.addTextElement("credits3", { ...anchor }, undefined, "Art by ingechu");
-    anchor.yOffPct += 0.15;
-    // anchor.yOffPct = 0.5;
-    parent.underBoardUIElements.credits.addTextElement("credits4", { ...anchor }, undefined, "Programming by Joel Flanagan");
-    anchor.yOffPct += 0.15;
-    // anchor.yOffPct = 0.6;
-    parent.underBoardUIElements.credits.addTextElement("credits5", { ...anchor }, undefined, "Sound by Leonardo Sunshine");
-    //  Produced by Hayley Coghlan Art by ingechu Programming by Joel Flanagan Sound by Leonardo Sunshine");
+    // anchor.heightPct = 0.045;
+    // anchor.yOffPct = 0.35;
+    // parent.underBoardUIElements.credits.addTextElement("credits2", { ...anchor }, undefined, "Produced by Hayley Coghlan");
+    // anchor.yOffPct += 0.15;
+    // parent.underBoardUIElements.credits.addTextElement("credits3", { ...anchor }, undefined, "Art by ingechu");
+    // anchor.yOffPct += 0.15;
+    // // anchor.yOffPct = 0.5;
+    // parent.underBoardUIElements.credits.addTextElement("credits4", { ...anchor }, undefined, "Programming by Joel Flanagan");
+    // anchor.yOffPct += 0.15;
+    // // anchor.yOffPct = 0.6;
+    // parent.underBoardUIElements.credits.addTextElement("credits5", { ...anchor }, undefined, "Sound by Leonardo Sunshine");
+
 
 }
 
@@ -612,8 +620,8 @@ function makeScraps(parent) {
     anchor.yOffPct = 0.5;
     anchor.horz = CENTER;
     anchor.vert = CENTER;
-    anchor.heightPct = 0.6;
-    anchor.widthRatio = 1;
+    anchor.widthPct = 0.6;
+    anchor.heightRatio = 1;
     parent.addUI("scraps", fullScreenPos(), fullScreenDim(), { ...anchor }, undefined, false);
 
     anchor.xOffPct = 0.98;

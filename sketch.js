@@ -47,8 +47,11 @@ function preload() {
   imageList.wormGameClick = loadImage('./assets/images/UI_Icon_wormgame_click.png');
   imageList.appleIdle = loadImage('./assets/images/UI_Icon_apple_idle.png');
   imageList.appleClick = loadImage('./assets/images/UI_Icon_apple_click.png');
-  imageList.notepadIdle = loadImage('./assets/images/UI_Icon_Notepad_Idle.png');
-  imageList.notepadClick = loadImage('./assets/images/UI_Icon_Notepad_Click.png');
+  imageList.notepadIdle = loadImage('./assets/images/UI_Icon_Credits_Idle.png');
+  imageList.notepadClick = loadImage('./assets/images/UI_Icon_Credits_Click.png');
+  
+  //credit
+  imageList.creditsWindow = loadImage('./assets/images/UI_Window_Credits.png');
   
   //taskbar
   imageList.livesWindow = loadImage('./assets/images/UI_Window_Lives.png');
@@ -140,6 +143,9 @@ function draw() {
   //check to see if any of the icons are being held down
   if (mouseIsPressed) {
     checkButtonHold(mouseX, mouseY);
+  } else {
+    //set all buttons to unheld state
+    game.normalButtons();
   }
 
   if (bIsDebugMode) {
@@ -253,18 +259,22 @@ function checkButtonHold(xPos, yPos) {
 function swipeControlEnd() {
 
   let bButtonWasClicked = false;
+  let bExitToReady = false;
   if (game.state == "scraps" || game.state == 'credits') {
     //override of scraps to go away on a click anywhere
-    game.changeState('ready');
-    game.underBoardUIElements.scraps.elements.scrapsX.state = 0;
-    game.underBoardUIElements.credits.elements.creditsX.state = 0;
+    bExitToReady = true;
   }
   if (bIsMobileFullscreen && divHeight > divWidth) {
     bButtonWasClicked = game.checkButtons(mouseY, height - mouseX);
   } else {
     bButtonWasClicked = game.checkButtons(mouseX, mouseY);
   }
-
+  if(bExitToReady){
+    game.changeState('ready');
+    game.underBoardUIElements.credits.elements.creditsX.state = 0;
+    game.underBoardUIElements.scraps.elements.scrapsX.state = 0;
+    
+  }
   if (isMobile && !bButtonWasClicked && game.state == 'play' && mouseDown != undefined) {
     //game swipe controls
     let mouseVec = createVector(mouseX, mouseY);//get current mouse or touch location

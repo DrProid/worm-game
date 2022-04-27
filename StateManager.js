@@ -98,23 +98,32 @@ class StateManager {
   checkButtons(xPos, yPos, type) {
     let bButtonWasClicked = false;
     for (let name in this.overBoardUIElements) {
-      if (this.overBoardUIElements[name].checkButtons(xPos, yPos, type)) {
+      if (!bButtonWasClicked && this.overBoardUIElements[name].checkButtons(xPos, yPos, type)) {
         bButtonWasClicked = true;
       }
     }
     for (let name in this.board.elements) {
-      if (this.board.elements[name].checkButtons(xPos, yPos, type)) {
+      if (!bButtonWasClicked && this.board.elements[name].checkButtons(xPos, yPos, type)) {
         bButtonWasClicked = true;
       }
     }
     for (let name in this.underBoardUIElements) {
-      if (this.underBoardUIElements[name].checkButtons(xPos, yPos, type)) {
+      if (!bButtonWasClicked && this.underBoardUIElements[name].checkButtons(xPos, yPos, type)) {
         bButtonWasClicked = true;
       }
     }
     return bButtonWasClicked;
   }
+  normalButtons() {
+    for (let name in this.overBoardUIElements) {
+      this.overBoardUIElements[name].normalButtons();
+    }
+    this.board.normalButtons();
 
+    for (let name in this.underBoardUIElements) {
+      this.underBoardUIElements[name].normalButtons();
+    }
+  }
   changeState(state) {
     switch (state) {
       case 'tutorial':
@@ -174,11 +183,13 @@ class StateManager {
         // gameStartSound();
         break;
       case 'scraps':
+        this.underBoardUIElements.desktop.setInteractable(false);
         this.underBoardUIElements.scraps.setVisible(true);
         this.underBoardUIElements.scraps.setInteractable(true);
         this.removeWormFact();
         break;
       case 'credits':
+        this.underBoardUIElements.desktop.setInteractable(false);
         this.underBoardUIElements.credits.setVisible(true);
         this.underBoardUIElements.credits.setInteractable(true);
         this.removeWormFact();
@@ -191,21 +202,21 @@ class StateManager {
 
   draw() {
 
-    
+
     //draw all of the UI that apears under game board
     for (let key in this.underBoardUIElements) {
       this.underBoardUIElements[key].draw();
-      if(key == 'desktop'){
+      if (key == 'desktop') {
         push();
         if (this.redFlash > 0) {
-          this.redFlash-=2;
+          this.redFlash -= 2;
         } else {
           this.redFlash = 0;
         }
         fill(255, 0, 0, this.redFlash);
         rect(0, 0, width, height);
         if (this.greenFlash > 0) {
-          this.greenFlash-=2;
+          this.greenFlash -= 2;
         } else {
           this.greenFlash = 0;
         }
@@ -214,7 +225,7 @@ class StateManager {
         pop();
       }
     }
-    
+
     if (this.state == 'play' || this.state == 'pause') {
       this.board.draw();
     }
