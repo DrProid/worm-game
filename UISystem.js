@@ -48,8 +48,16 @@ class UI {
         //only one ratio can be used, width takes priority if both are set (don't set both)
         if (this.anchor.widthRatio != undefined) {
             this.dim.width = this.anchor.widthRatio * this.dim.height;
+            if(this.dim.width > parentDim.width){
+                this.dim.width = parentDim.width;
+                this.dim.height = (1/this.anchor.widthRatio) * this.dim.width;
+            }
         } else if (this.anchor.heightRatio != undefined) {
             this.dim.height = this.anchor.heightRatio * this.dim.width;
+            if(this.dim.height > parentDim.height){
+                this.dim.height = parentDim.height;
+                this.dim.width = (1/this.anchor.heightRatio) * this.dim.height;
+            }
         }
 
         //adjust for non-left anchors
