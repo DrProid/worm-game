@@ -8,9 +8,10 @@ const CLICK = "click";
 const HOLD = "hold";
 
 let mouseDown;
+let lastMobileTap = { x: 0, y: 0, time: 0 };
 
 let bIsDebugMode = false;
-let version = "v0.2";
+let version = "v0.201";
 
 let suppressPauseTimer = 0;
 
@@ -38,7 +39,7 @@ function preload() {
   imageList.tutorialOkClick = loadImage('./assets/images/UI_Window_Wormgame_Tutorial_Button_OK_Click.png');
   imageList.tutorialXIdle = loadImage('./assets/images/UI_Window_Wormgame_Tutorial_Button_X_Idle.png');
   imageList.tutorialXClick = loadImage('./assets/images/UI_Window_Wormgame_Tutorial_Button_X_Click.png');
-  
+
   //desktop
   imageList.bg = loadImage('./assets/images/UI_BackGround.png');
   imageList.bucketIdle = loadImage('./assets/images/UI_Icon_Bucket_Idle.png');
@@ -49,12 +50,12 @@ function preload() {
   imageList.appleClick = loadImage('./assets/images/UI_Icon_apple_click.png');
   imageList.notepadIdle = loadImage('./assets/images/UI_Icon_Credits_Idle.png');
   imageList.notepadClick = loadImage('./assets/images/UI_Icon_Credits_Click.png');
-  
+
   //credits
   imageList.creditsWindow = loadImage('./assets/images/UI_Window_Credits.png');
   imageList.creditsXIdle = loadImage('./assets/images/UI_Window_Credits_Button_X_Idle.png');
   imageList.creditsXClick = loadImage('./assets/images/UI_Window_Credits_Button_X_Click.png');
-  
+
   //taskbar
   imageList.livesWindow = loadImage('./assets/images/UI_Window_Lives.png');
   imageList.life = loadImage('./assets/images/UI_Hearts.gif');
@@ -246,8 +247,21 @@ function mouseReleased() {
 
 function swipeControlStart() {
   mouseDown = createVector(mouseX, mouseY);//store the position of the mouse when it is pressed
-  // checkButtonHold(mouseX, mouseY);
-  mouseSound();
+
+  if (isMobile && (lastMobileTap.x != mouseX && lastMobileTap.y != mouseY && lastMobileTap.time <= millis() - 100)) {
+    //check for the stupid p5 double tap bug on mobile.
+    lastMobileTap.x = mouseX;
+    lastMobileTap.y = mouseY;
+    lastMobileTap.time = millis();
+    if (bIsMobileFullscreen && divHeight > divWidth) {
+      bButtonWasClicked = game.checkButtons(mouseY, height - mouseX);
+    } else {
+      bButtonWasClicked = game.checkButtons(mouseX, mouseY);
+    }
+    mouseSound();
+  } else if(!isMobile){
+    mouseSound();
+  }
 }
 
 function checkButtonHold(xPos, yPos) {
@@ -261,22 +275,15 @@ function checkButtonHold(xPos, yPos) {
 function swipeControlEnd() {
 
   let bButtonWasClicked = false;
-  // let bExitToReady = false;
-  // if (game.state == "scraps" || game.state == 'credits') {
-  //   //override of scraps to go away on a click anywhere
-  //   bExitToReady = true;
-  // }
-  if (bIsMobileFullscreen && divHeight > divWidth) {
-    bButtonWasClicked = game.checkButtons(mouseY, height - mouseX);
-  } else {
-    bButtonWasClicked = game.checkButtons(mouseX, mouseY);
+
+  if(!isMobile){
+    if (bIsMobileFullscreen && divHeight > divWidth) {
+      bButtonWasClicked = game.checkButtons(mouseY, height - mouseX);
+    } else {
+      bButtonWasClicked = game.checkButtons(mouseX, mouseY);
+    }
   }
-  // if(bExitToReady){
-  //   game.changeState('ready');
-  //   game.underBoardUIElements.credits.elements.creditsX.state = 0;
-  //   game.underBoardUIElements.scraps.elements.scrapsX.state = 0;
-    
-  // }
+
   if (isMobile && !bButtonWasClicked && game.state == 'play' && mouseDown != undefined) {
     //game swipe controls
     let mouseVec = createVector(mouseX, mouseY);//get current mouse or touch location

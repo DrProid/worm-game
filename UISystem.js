@@ -288,6 +288,7 @@ class ButtonElement extends TextElement {
         } else {
             this.state = 0;
         }
+        return false;
     }
     checkClick(xPos, yPos) {
         if (this.isOverElement(xPos, yPos)) {
