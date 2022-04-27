@@ -10,7 +10,7 @@ const HOLD = "hold";
 let mouseDown;
 
 let bIsDebugMode = true;
-let version = "v0.196";
+let version = "v0.197";
 
 let suppressPauseTimer = 0;
 
@@ -228,17 +228,17 @@ function keyPressed() {
   }
 }
 
-// function touchStarted() {
-//   swipeControlStart();
-// }
+function touchStarted() {
+  swipeControlStart();
+}
 
 function mousePressed() {
   swipeControlStart();
 }
 
-// function touchEnded() {
-//   swipeControlEnd();
-// }
+function touchEnded() {
+  swipeControlEnd();
+}
 
 function mouseReleased() {
   swipeControlEnd();
@@ -261,22 +261,22 @@ function checkButtonHold(xPos, yPos) {
 function swipeControlEnd() {
 
   let bButtonWasClicked = false;
-  let bExitToReady = false;
-  if (game.state == "scraps" || game.state == 'credits') {
-    //override of scraps to go away on a click anywhere
-    bExitToReady = true;
-  }
+  // let bExitToReady = false;
+  // if (game.state == "scraps" || game.state == 'credits') {
+  //   //override of scraps to go away on a click anywhere
+  //   bExitToReady = true;
+  // }
   if (bIsMobileFullscreen && divHeight > divWidth) {
     bButtonWasClicked = game.checkButtons(mouseY, height - mouseX);
   } else {
     bButtonWasClicked = game.checkButtons(mouseX, mouseY);
   }
-  if(bExitToReady){
-    game.changeState('ready');
-    game.underBoardUIElements.credits.elements.creditsX.state = 0;
-    game.underBoardUIElements.scraps.elements.scrapsX.state = 0;
+  // if(bExitToReady){
+  //   game.changeState('ready');
+  //   game.underBoardUIElements.credits.elements.creditsX.state = 0;
+  //   game.underBoardUIElements.scraps.elements.scrapsX.state = 0;
     
-  }
+  // }
   if (isMobile && !bButtonWasClicked && game.state == 'play' && mouseDown != undefined) {
     //game swipe controls
     let mouseVec = createVector(mouseX, mouseY);//get current mouse or touch location

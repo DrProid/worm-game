@@ -575,8 +575,8 @@ function makeCredits(parent) {
     anchor.yOffPct = 0.5;
     anchor.horz = CENTER;
     anchor.vert = CENTER;
-    anchor.widthPct = 0.8;
-    anchor.heightRatio = imageList.creditsWindow.height / imageList.creditsWindow.width;
+    anchor.heightPct = 0.9;
+    anchor.widthRatio = imageList.creditsWindow.width / imageList.creditsWindow.height;
     parent.addUI("credits", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.creditsWindow, false);
 
     anchor.xOffPct = 0.978;
@@ -620,8 +620,8 @@ function makeScraps(parent) {
     anchor.yOffPct = 0.5;
     anchor.horz = CENTER;
     anchor.vert = CENTER;
-    anchor.widthPct = 0.6;
-    anchor.heightRatio = 1;
+    anchor.heightPct = 0.9;
+    anchor.widthRatio = 1;
     parent.addUI("scraps", fullScreenPos(), fullScreenDim(), { ...anchor }, undefined, false);
 
     anchor.xOffPct = 0.98;
