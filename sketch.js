@@ -246,7 +246,7 @@ function mouseReleased() {
 
 function swipeControlStart() {
   mouseDown = createVector(mouseX, mouseY);//store the position of the mouse when it is pressed
-  checkButtonHold(mouseX, mouseY);
+  // checkButtonHold(mouseX, mouseY);
   mouseSound();
 }
 
