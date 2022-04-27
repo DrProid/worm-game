@@ -28,6 +28,7 @@ class StateManager {
 
     this.overBoardUIElements = {};
     makePauseUI(this);
+    this.pauseTimer = 0;
     makeGameOver(this);
 
     this.level = 0;
@@ -59,7 +60,7 @@ class StateManager {
   togglePause(forceState) {
     if (forceState != undefined) {
       this.changeState(forceState);
-    } else if (this.state == 'pause') {
+    } else if (this.state == 'pause' && this.pauseTimer <= millis()) {
       this.changeState('play');
     } else if (this.state == 'play') {
       this.changeState('pause');
@@ -175,6 +176,7 @@ class StateManager {
         this.overBoardUIElements.pause.setVisible(true);
         this.overBoardUIElements.pause.setInteractable(true);
         this.underBoardUIElements.desktop.setInteractable(false);
+        this.pauseTimer = millis() + 250;
         break;
       case 'gameOver':
         this.overBoardUIElements.gameOver.elements.score.text = round(this.score);
