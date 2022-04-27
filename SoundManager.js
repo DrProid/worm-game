@@ -36,7 +36,9 @@ var mouseClickSound = new Howl({
     src: [`./assets/audio/mouse_click.webm`, `./assets/audio/mouse_click.mp3`, `./assets/audio/mouse_click.wav`]
 })
 
-var backgroundMusic = bgm.play();
+if(!isMobile){
+    var backgroundMusic = bgm.play();
+}
 
 function badSound() {
     random(bad).play();

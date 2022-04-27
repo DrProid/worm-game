@@ -248,6 +248,7 @@ function mouseReleased() {
 function swipeControlStart() {
   mouseDown = createVector(mouseX, mouseY);//store the position of the mouse when it is pressed
   if (game.state == 'mobileWelcome') {
+    bgm.play();
     game.changeState('ready');
   }
   if (isMobile && (lastMobileTap.x != mouseX && lastMobileTap.y != mouseY && lastMobileTap.time <= millis() - 100)) {
