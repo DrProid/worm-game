@@ -275,10 +275,13 @@ class BoardElement {
         if (this.visible) {
             for (let name in this.elements) {
                 if (this.elements[name] instanceof ButtonElement) {
-                    this.elements[name].checkButtons(xPos, yPos, type);
+                    if( this.elements[name].checkButtons(xPos, yPos, type)){
+                        return true;
+                    }
                 }
             }
         }
+        return false;
     }
     normalButtons(){
         for (let name in this.elements) {
