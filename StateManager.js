@@ -62,7 +62,7 @@ class StateManager {
       this.changeState(forceState);
     } else if (this.state == 'pause' && this.pauseTimer <= millis()) {
       this.changeState('play');
-    } else if (this.state == 'play') {
+    } else if (this.state == 'play' && this.pauseTimer <= millis()) {
       this.changeState('pause');
     }
   }
@@ -169,6 +169,8 @@ class StateManager {
           this.score = 0;
           this.board.foods = [];
           gameStartSound();
+        } else {
+          this.pauseTimer = millis() + 500;
         }
         this.removeWormFact();
         break;
@@ -176,7 +178,7 @@ class StateManager {
         this.overBoardUIElements.pause.setVisible(true);
         this.overBoardUIElements.pause.setInteractable(true);
         this.underBoardUIElements.desktop.setInteractable(false);
-        this.pauseTimer = millis() + 250;
+        this.pauseTimer = millis() + 500;
         break;
       case 'gameOver':
         this.overBoardUIElements.gameOver.elements.score.text = round(this.score);

@@ -10,7 +10,7 @@ const HOLD = "hold";
 let mouseDown;
 
 let bIsDebugMode = false;
-let version = "v0.198";
+let version = "v0.199";
 
 let suppressPauseTimer = 0;
 
