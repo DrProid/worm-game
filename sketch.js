@@ -228,17 +228,17 @@ function keyPressed() {
   }
 }
 
-function touchStarted() {
-  swipeControlStart();
-}
+// function touchStarted() {
+//   swipeControlStart();
+// }
 
 function mousePressed() {
   swipeControlStart();
 }
 
-function touchEnded() {
-  swipeControlEnd();
-}
+// function touchEnded() {
+//   swipeControlEnd();
+// }
 
 function mouseReleased() {
   swipeControlEnd();

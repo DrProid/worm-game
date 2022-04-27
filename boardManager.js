@@ -175,7 +175,7 @@ class BoardElement {
                     this.worm.headOverride = imageList.wormHeadBad;
                 }
             } else {
-                if (this.foods.length < this.maxFood && random() < 0.05) {
+                if (this.foods.length < this.maxFood /*&& random() < 0.05*/) {
                     this.spawnFood();
                 }
             }
