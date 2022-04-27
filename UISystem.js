@@ -48,14 +48,14 @@ class UI {
         //only one ratio can be used, width takes priority if both are set (don't set both)
         if (this.anchor.widthRatio != undefined) {
             this.dim.width = this.anchor.widthRatio * this.dim.height;
-            if(this.dim.width > parentDim.width){
-                this.dim.width = parentDim.width;
+            if(this.dim.width > parentDim.width * this.anchor.widthPct){
+                this.dim.width = parentDim.width * this.anchor.widthPct;
                 this.dim.height = (1/this.anchor.widthRatio) * this.dim.width;
             }
         } else if (this.anchor.heightRatio != undefined) {
             this.dim.height = this.anchor.heightRatio * this.dim.width;
-            if(this.dim.height > parentDim.height){
-                this.dim.height = parentDim.height;
+            if(this.dim.height > parentDim.height * this.anchor.heightPct){
+                this.dim.height = parentDim.height * this.anchor.heightPct;
                 this.dim.width = (1/this.anchor.heightRatio) * this.dim.height;
             }
         }
@@ -345,6 +345,7 @@ function makeWelcomeUI(parent) {
     anchor.horz = CENTER;
     anchor.vert = CENTER;
     anchor.widthPct = 0.9;
+    anchor.heightPct = 0.9;
     anchor.heightRatio = imageList.tutorial.height / imageList.tutorial.width;
     parent.addUI("tutorial", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.tutorial, false);
 
@@ -376,11 +377,13 @@ function makePauseUI(parent) {
     anchor.horz = CENTER;
     anchor.vert = CENTER;
     anchor.widthPct = 0.3;
+    anchor.heightPct = 0.3;
     anchor.heightRatio = imageList.pauseWindow.height / imageList.pauseWindow.width;
     parent.addUI("pause", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.pauseWindow);
-
+    
     anchor.vert = BOTTOM;
     anchor.widthPct = 0.5;
+    anchor.heightPct = 0.5;
     anchor.heightRatio = imageList.resumeIdle.height / imageList.resumeIdle.width;
     anchor.yOffPct = 0.8;
     parent.overBoardUIElements.pause.addButtonElement("unpause", { ...anchor }, [imageList.resumeIdle, imageList.resumeClick], "UNPAUSE", () => {
@@ -395,7 +398,8 @@ function makeGameOver(parent) {
     anchor.yOffPct = 0.5;
     anchor.horz = CENTER;
     anchor.vert = CENTER;
-    anchor.widthPct = 0.3;
+    anchor.widthPct = 0.5;
+    anchor.heightPct = 0.5;
     anchor.heightRatio = imageList.gameOverWindow.height / imageList.gameOverWindow.width;
     parent.addUI("gameOver", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.gameOverWindow);
 
@@ -407,6 +411,7 @@ function makeGameOver(parent) {
 
     anchor.vert = BOTTOM;
     anchor.heightPct = 0.2;
+    anchor.widthPct = 0.8;
     anchor.widthRatio = imageList.playAgainClick.width / imageList.playAgainClick.height;
     anchor.yOffPct = 0.9;
     parent.overBoardUIElements.gameOver.addButtonElement("playAgain", { ...anchor }, [imageList.playAgainIdle, imageList.playAgainClick], "play again", () => {
@@ -547,7 +552,8 @@ function makeTaskBar(parent) {
     anchor.widthRatio = imageList.livesWindow.width / imageList.livesWindow.height;
     parent.addUI("lives", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.livesWindow, false);
 
-    anchor.heightPct = 0.9;
+    anchor.heightPct = 1;
+    anchor.widthPct = 1;
     anchor.widthRatio = imageList.life.width / imageList.life.height;
     anchor.xOffPct = 1 / 4;
     anchor.yOffPct = 0.5;
@@ -584,6 +590,7 @@ function makeCredits(parent) {
     anchor.horz = CENTER;
     anchor.vert = CENTER;
     anchor.heightPct = 0.9;
+    anchor.widthPct = 0.9;
     anchor.widthRatio = imageList.creditsWindow.width / imageList.creditsWindow.height;
     parent.addUI("credits", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.creditsWindow, false);
 
@@ -629,6 +636,7 @@ function makeScraps(parent) {
     anchor.horz = CENTER;
     anchor.vert = CENTER;
     anchor.heightPct = 0.9;
+    anchor.widthPct = 0.9;
     anchor.widthRatio = 1;
     parent.addUI("scraps", fullScreenPos(), fullScreenDim(), { ...anchor }, undefined, false);
 
@@ -637,6 +645,7 @@ function makeScraps(parent) {
     anchor.vert = TOP;
     anchor.horz = RIGHT;
     anchor.widthPct = 0.05;
+    anchor.heightPct = 0.05;
     anchor.heightRatio = 1;
     anchor.widthRatio = undefined;
     parent.underBoardUIElements.scraps.addButtonElement("scrapsX", { ...anchor }, [imageList.factXIdle, imageList.factXClick], "X", () => {
@@ -670,6 +679,7 @@ function makeScraps(parent) {
     parent.underBoardUIElements.scraps.addTextElement("badTitle", { ...anchor }, undefined, "BAD FOOD FOR WORMS");
 
     anchor.heightPct = 0.1;
+    anchor.widthPct = 0.1;
     anchor.widthRatio = 1.5;
     anchor.yOffPct = 0.965;
     anchor.xOffPct = 3 / 8;
@@ -682,6 +692,7 @@ function makeScraps(parent) {
     parent.underBoardUIElements.scraps.addTextElement("loveworm", { ...anchor }, imageList.wormDance, "");
 
     anchor.heightPct = 0.09;
+    anchor.widthPct = 0.09;
     anchor.widthRatio = 1;
     for (let i in imageList.good) {
         let row = floor(i / 5);
