@@ -18,6 +18,7 @@ class StateManager {
 
     this.underBoardUIElements = {};
     makeDesktop(this);
+    makeIntro(this);
     makeMobileWelcome(this);
     makeWelcomeUI(this);
     makeScraps(this);
@@ -37,10 +38,8 @@ class StateManager {
     this.score = 0;
     this.life = 3;
 
-    this.changeState('ready');
-    if(isMobile){
-      this.changeState('mobileWelcome');
-    }
+    // this.changeState('ready');
+    this.changeState('intro');
 
   }
   makeWormFact() {
@@ -129,6 +128,10 @@ class StateManager {
   }
   changeState(state) {
     switch (state) {
+      case 'intro':
+        this.underBoardUIElements.intro.setVisible(true);
+        this.underBoardUIElements.intro.setInteractable(true);
+        break;
       case 'tutorial':
         this.underBoardUIElements.tutorial.setVisible(true);
         this.underBoardUIElements.tutorial.setInteractable(true);
@@ -138,6 +141,8 @@ class StateManager {
         this.removeWormFact();
         break;
       case 'ready':
+        this.underBoardUIElements.intro.setVisible(false);
+        this.underBoardUIElements.intro.setInteractable(false);
         this.underBoardUIElements.tutorial.setVisible(false);
         this.underBoardUIElements.tutorial.setInteractable(false);
         this.overBoardUIElements.pause.setVisible(false);
@@ -203,6 +208,8 @@ class StateManager {
         this.removeWormFact();
         break;
       case 'mobileWelcome':
+        this.underBoardUIElements.intro.setVisible(false);
+        this.underBoardUIElements.intro.setInteractable(false);
         this.underBoardUIElements.desktop.setInteractable(false);
         this.underBoardUIElements.mobileWelcome.setVisible(true);
         this.underBoardUIElements.mobileWelcome.setInteractable(true);

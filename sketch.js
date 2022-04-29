@@ -29,6 +29,10 @@ function preload() {
 
   imageList.wormDance = loadImage('./assets/images/wormdance_02.gif');
 
+  //title
+  imageList.title = loadImage('./assets/images/UI_Title.png');
+  imageList.mobileWelcome = loadImage('./assets/images/UI_Window_PlayOnMobile.png');
+
   //welcome
   if (isMobile) {
     imageList.tutorial = loadImage('./assets/images/UI_Window_Wormgame_Tutorial_Tablet.png');
@@ -50,6 +54,9 @@ function preload() {
   imageList.appleClick = loadImage('./assets/images/UI_Icon_apple_click.png');
   imageList.notepadIdle = loadImage('./assets/images/UI_Icon_Credits_Idle.png');
   imageList.notepadClick = loadImage('./assets/images/UI_Icon_Credits_Click.png');
+
+  //scraps
+  imageList.scraps = loadImage('./assets/images/UI_Window_Scraps.png')
 
   //credits
   imageList.creditsWindow = loadImage('./assets/images/UI_Window_Credits.png');
@@ -167,6 +174,14 @@ function draw() {
     pop();
   }
 
+  if (game.state == 'intro' && millis() > 3000) {
+    if(isMobile){
+      game.changeState('mobileWelcome');
+    } else {
+      game.changeState('ready');
+    }
+
+  }
 }
 
 function windowResized() {
@@ -247,8 +262,11 @@ function mouseReleased() {
 
 function swipeControlStart() {
   mouseDown = createVector(mouseX, mouseY);//store the position of the mouse when it is pressed
-  if (game.state == 'mobileWelcome') {
+  if (game.state == 'mobileWelcome' || (isMobile && game.state == 'intro')) {
     bgm.play();
+    game.changeState('ready');
+  }
+  if (game.state == 'intro') {
     game.changeState('ready');
   }
   if (isMobile && (lastMobileTap.x != mouseX && lastMobileTap.y != mouseY && lastMobileTap.time <= millis() - 100)) {

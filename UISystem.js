@@ -518,6 +518,7 @@ function makeWormFact(parent) {
     anchor.horz = RIGHT;
     anchor.vert = BOTTOM;
     anchor.widthPct = 0.5;
+    anchor.heightPct = 0.5;
     anchor.heightRatio = imageList.facts[0].height / imageList.facts[0].width;
     parent.addUI("fact", fullScreenPos(), fullScreenDim(), { ...anchor }, random(imageList.facts));
 
@@ -626,21 +627,21 @@ function makeMobileWelcome(parent){
     anchor.yOffPct = 0.5;
     anchor.horz = CENTER;
     anchor.vert = CENTER;
-    anchor.heightPct = 0.25;
+    anchor.heightPct = 0.6;
     anchor.widthPct = 0.6;
-    anchor.widthRatio = anchor.widthPct / anchor.heightPct;
-    parent.addUI("mobileWelcome", fullScreenPos(), fullScreenDim(), { ...anchor }, undefined, false);
+    anchor.widthRatio =  imageList.mobileWelcome.width / imageList.mobileWelcome.height;
+    parent.addUI("mobileWelcome", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.mobileWelcome, false);
 
-    anchor.xOffPct = 0.5;
-    anchor.yOffPct = 0.55;
-    anchor.widthPct = 0.8;
-    anchor.heightPct = 0.7;
-    anchor.widthRatio = undefined;
-    parent.underBoardUIElements.mobileWelcome.addBoxElement("goodBox", { ...anchor }, color('#79EA89'));
+    // anchor.xOffPct = 0.5;
+    // anchor.yOffPct = 0.55;
+    // anchor.widthPct = 0.8;
+    // anchor.heightPct = 0.7;
+    // anchor.widthRatio = undefined;
+    // parent.underBoardUIElements.mobileWelcome.addBoxElement("goodBox", { ...anchor }, color('#79EA89'));
     
     anchor.widthPct = 0;
     anchor.heightPct = 0.2;
-    parent.underBoardUIElements.mobileWelcome.addTextElement("fullscreen", { ...anchor }, undefined, "Play on mobile");
+    parent.underBoardUIElements.mobileWelcome.addTextElement("fullscreen", { ...anchor }, undefined, "");
 
     // anchor.xOffPct = 0.978;
     // anchor.yOffPct = 0.029;
@@ -665,75 +666,86 @@ function makeScraps(parent) {
     anchor.vert = CENTER;
     anchor.heightPct = 0.9;
     anchor.widthPct = 0.9;
-    anchor.widthRatio = 1;
-    parent.addUI("scraps", fullScreenPos(), fullScreenDim(), { ...anchor }, undefined, false);
+    anchor.widthRatio = imageList.scraps.width / imageList.scraps.height;
+    parent.addUI("scraps", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.scraps, false);
 
-    anchor.xOffPct = 0.98;
+    anchor.xOffPct = 0.988;
     anchor.yOffPct = 0.0225;
     anchor.vert = TOP;
     anchor.horz = RIGHT;
-    anchor.widthPct = 0.05;
-    anchor.heightPct = 0.05;
-    anchor.heightRatio = 1;
-    anchor.widthRatio = undefined;
-    parent.underBoardUIElements.scraps.addButtonElement("scrapsX", { ...anchor }, [imageList.factXIdle, imageList.factXClick], "X", () => {
+    // anchor.widthPct = 0.04;
+    anchor.heightPct = 0.075;
+    // anchor.heightRatio = 1;
+    anchor.widthRatio = imageList.tutorialXIdle.width / imageList.tutorialXIdle.height;
+    parent.underBoardUIElements.scraps.addButtonElement("scrapsX", { ...anchor }, [imageList.tutorialXIdle, imageList.tutorialXClick], "X", () => {
         boopSound();
         parent.changeState('ready');
     });
 
-    anchor.widthRatio = undefined;
-    anchor.heightRatio = undefined;
+    // anchor.widthRatio = undefined;
+    // anchor.heightRatio = undefined;
+    // anchor.horz = CENTER;
+    // anchor.vert = CENTER;
+    // anchor.xOffPct = 0.5;
+    // anchor.widthPct = 0;
+    // anchor.heightPct = 0.03;
+    // anchor.yOffPct = 0.52;
+    // parent.underBoardUIElements.scraps.addTextElement("speed hint", { ...anchor }, undefined, `Keep ${(isMobile ? 'swiping' : 'tapping')} for more speed!`);
+
+    // anchor.xOffPct = 0.5;
+    // anchor.widthPct = 0.9;
+    // anchor.heightPct = 0.35;
+    // anchor.yOffPct = 0.3;
+    // parent.underBoardUIElements.scraps.addBoxElement("goodBox", { ...anchor }, color('#79EA89'));
+    // anchor.yOffPct = 0.75;
+    // parent.underBoardUIElements.scraps.addBoxElement("badBox", { ...anchor }, color('#E85C5C'));
+
+    // anchor.widthPct = 0;
+    // anchor.heightPct = 0.03;
+    // anchor.yOffPct = 0.15;
+    // parent.underBoardUIElements.scraps.addTextElement("goodTitle", { ...anchor }, undefined, "GOOD FOOD FOR WORMS");
+    // anchor.yOffPct = 0.6;
+    // parent.underBoardUIElements.scraps.addTextElement("badTitle", { ...anchor }, undefined, "BAD FOOD FOR WORMS");
+
+    // anchor.heightPct = 0.1;
+    // anchor.widthPct = 0.1;
+    // anchor.widthRatio = 1.5;
+    // anchor.yOffPct = 0.965;
+    // anchor.xOffPct = 3 / 8;
+    // parent.underBoardUIElements.scraps.addTextElement("love0", { ...anchor }, imageList.life, "");
+    // anchor.xOffPct = 5 / 8;
+    // parent.underBoardUIElements.scraps.addTextElement("love1", { ...anchor }, imageList.life, "");
+    // anchor.heightPct = 0.05;
+    // anchor.widthRatio = 1;
+    // anchor.xOffPct = 0.5;
+    // parent.underBoardUIElements.scraps.addTextElement("loveworm", { ...anchor }, imageList.wormDance, "");
+
+    // anchor.heightPct = 0.09;
+    // anchor.widthPct = 0.09;
+    // anchor.widthRatio = 1;
+    // for (let i in imageList.good) {
+    //     let row = floor(i / 5);
+    //     anchor.yOffPct = row * 0.125 + 0.25;
+
+    //     anchor.xOffPct = map(i % 5, 0, 4, 0.2, 0.8);
+    //     parent.underBoardUIElements.scraps.addTextElement("good" + i, { ...anchor }, imageList.good[i], "");
+    // }
+
+    // for (let i in imageList.bad) {
+    //     let row = floor(i / 4);
+    //     anchor.yOffPct = row * 0.125 + 0.7;
+    //     anchor.xOffPct = map(i % 4, 0, 3, 0.2, 0.8);
+    //     parent.underBoardUIElements.scraps.addTextElement("bad" + i, { ...anchor }, imageList.bad[i], "");
+    // }
+}
+
+function makeIntro(parent){
+    let anchor = defaultAnchor();
+    anchor.xOffPct = 0.5;
+    anchor.yOffPct = 0.5;
     anchor.horz = CENTER;
     anchor.vert = CENTER;
-    anchor.xOffPct = 0.5;
-    anchor.widthPct = 0;
-    anchor.heightPct = 0.03;
-    anchor.yOffPct = 0.52;
-    parent.underBoardUIElements.scraps.addTextElement("speed hint", { ...anchor }, undefined, `Keep ${(isMobile ? 'swiping' : 'tapping')} for more speed!`);
-
-    anchor.xOffPct = 0.5;
     anchor.widthPct = 0.9;
-    anchor.heightPct = 0.35;
-    anchor.yOffPct = 0.3;
-    parent.underBoardUIElements.scraps.addBoxElement("goodBox", { ...anchor }, color('#79EA89'));
-    anchor.yOffPct = 0.75;
-    parent.underBoardUIElements.scraps.addBoxElement("badBox", { ...anchor }, color('#E85C5C'));
-
-    anchor.widthPct = 0;
-    anchor.heightPct = 0.03;
-    anchor.yOffPct = 0.15;
-    parent.underBoardUIElements.scraps.addTextElement("goodTitle", { ...anchor }, undefined, "GOOD FOOD FOR WORMS");
-    anchor.yOffPct = 0.6;
-    parent.underBoardUIElements.scraps.addTextElement("badTitle", { ...anchor }, undefined, "BAD FOOD FOR WORMS");
-
-    anchor.heightPct = 0.1;
-    anchor.widthPct = 0.1;
-    anchor.widthRatio = 1.5;
-    anchor.yOffPct = 0.965;
-    anchor.xOffPct = 3 / 8;
-    parent.underBoardUIElements.scraps.addTextElement("love0", { ...anchor }, imageList.life, "");
-    anchor.xOffPct = 5 / 8;
-    parent.underBoardUIElements.scraps.addTextElement("love1", { ...anchor }, imageList.life, "");
-    anchor.heightPct = 0.05;
-    anchor.widthRatio = 1;
-    anchor.xOffPct = 0.5;
-    parent.underBoardUIElements.scraps.addTextElement("loveworm", { ...anchor }, imageList.wormDance, "");
-
-    anchor.heightPct = 0.09;
-    anchor.widthPct = 0.09;
-    anchor.widthRatio = 1;
-    for (let i in imageList.good) {
-        let row = floor(i / 5);
-        anchor.yOffPct = row * 0.125 + 0.25;
-
-        anchor.xOffPct = map(i % 5, 0, 4, 0.2, 0.8);
-        parent.underBoardUIElements.scraps.addTextElement("good" + i, { ...anchor }, imageList.good[i], "");
-    }
-
-    for (let i in imageList.bad) {
-        let row = floor(i / 4);
-        anchor.yOffPct = row * 0.125 + 0.7;
-        anchor.xOffPct = map(i % 4, 0, 3, 0.2, 0.8);
-        parent.underBoardUIElements.scraps.addTextElement("bad" + i, { ...anchor }, imageList.bad[i], "");
-    }
+    anchor.heightRatio = imageList.title.height / imageList.title.width;
+    parent.addUI("intro", fullScreenPos(), fullScreenDim(), { ...anchor }, imageList.title, false);
 }
